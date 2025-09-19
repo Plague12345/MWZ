@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MWZ Exfil Cooldown Calculator</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; background:#0f1115; color:#eaeaea; padding:24px; }
+    .card { max-width:660px; margin:auto; background:#171a21; padding:20px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+    h1 { margin:0 0 12px; font-size:22px; }
+    label { display:block; margin-top:14px; font-weight:600; }
+    input { width:100%; padding:12px; border-radius:10px; border:1px solid #2a2f3a; background:#0f1319; color:#eaeaea; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .muted { color:#9aa3b2; font-size:13px; }
+    .result { margin-top:16px; padding:14px; background:#0f1319; border:1px solid #2a2f3a; border-radius:10px; }
+    .accent { color:#39ff14; font-weight:700; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>MWZ Exfil Cooldown Calculator</h1>
+    <p class="muted">Rule of thumb: <b>240 essence = 1 minute</b> of cooldown reduction.</p>
+
+    <div class="row">
+      <div>
+        <label>Essence → Time</label>
+        <input id="essence" type="number" placeholder="e.g. 7200" />
+        <div id="timeOut" class="result">Enter essence to see time.</div>
+      </div>
+      <div>
+        <label>Time (minutes or HH:MM) → Essence</label>
+        <input id="time" type="text" placeholder="e.g. 30 or 1:30" />
+        <div id="essOut" class="result">Enter time to see essence.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const EPM = 240; // essence per minute
+
+    const essence = document.getElementById('essence');
+    const time = document.getElementById('time');
+    const timeOut = document.getElementById('timeOut');
+    const essOut = document.getElementById('essOut');
+
+    function minutesToHMS(mins) {
+      const s = Math.round(mins * 60);
+      const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+      return h ? `${h}h ${m}m ${sec}s` : (m ? `${m}m ${sec}s` : `${sec}s`);
+    }
+    function parseTimeToMinutes(str) {
+      if (!str) return NaN;
+      if (/^\d+$/.test(str)) return +str; // plain minutes
+      const parts = str.split(':').map(Number);
+      if (parts.length === 2) return parts[0]*60 + parts[1];
+      return NaN;
+    }
+
+    essence.addEventListener('input', () => {
+      const e = +essence.value;
+      if (e > 0) {
+        const mins = e / EPM;
+        timeOut.innerHTML = `<span class="accent">${e.toLocaleString()}</span> essence ≈ <span class="accent">${minutesToHMS(mins)}</span> reduction`;
+      } else timeOut.textContent = 'Enter essence to see time.';
+    });
+
+    time.addEventListener('input', () => {
+      const t = parseTimeToMinutes(time.value.trim());
+      if (!isNaN(t) && t > 0) {
+        const needed = Math.round(t * EPM);
+        essOut.innerHTML = `<span class="accent">${t} min</span> reduction ≈ <span class="accent">${needed.toLocaleString()} essence</span>`;
+      } else essOut.textContent = 'Enter time (minutes or HH:MM) to see essence.';
+    });
+  </script>
+</body>
+</html>
