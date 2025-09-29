@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ Schematics Finder • Interactive Guide</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --accent:#66b3ff; --accent2:#8de0a6;
+    --chip:#1a2236; --chip2:#152038; --ring:#334267;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  a{color:var(--accent)}
+  header{position:sticky;top:0;z-index:5;background:rgba(11,15,23,.92);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid #1c2740}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  h1{font-size:1.6rem;margin:0 0 .25rem 0;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:.92rem}
+  .toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:14px}
+  input[type="search"]{width:100%;padding:.7rem .85rem;border-radius:10px;border:1px solid var(--ring);background:#0f1628;color:var(--text)}
+  select,button{border:1px solid var(--ring);background:#0f1628;color:var(--text);padding:.6rem .75rem;border-radius:10px}
+  button{cursor:pointer}
+  main{max-width:1100px;margin:18px auto;padding:0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid #1b2742;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .thumb{aspect-ratio:16/10;background:#0f1628 url('') center/cover no-repeat;display:block}
+  .meta{padding:12px}
+  .name{font-weight:700;font-size:1.02rem;margin:0 0 .4rem}
+  .cat{font-size:.78rem;color:var(--muted)}
+  .chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:.75rem;background:var(--chip);border:1px solid #1f2944;border-radius:999px;padding:4px 8px;color:#cfe2ff}
+  .details{display:none}
+  .card.active .details{display:block}
+  .card.active .meta{border-top:1px dashed #233356;margin-top:10px;padding-top:10px}
+  .loc{font-size:.92rem;color:#e9f5ff}
+  .viewtoggle{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:14px 0}
+  .hidden{display:none!important}
+  table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  th,td{text-align:left;padding:10px 12px}
+  thead th{color:#c9d9fb;font-weight:700}
+  tbody tr{background:var(--panel);border:1px solid #1b2742}
+  tbody td{border-top:1px solid #1b2742;border-bottom:1px solid #1b2742}
+  tbody td:first-child{border-left:1px solid #1b2742;border-top-left-radius:10px;border-bottom-left-radius:10px}
+  tbody td:last-child{border-right:1px solid #1b2742;border-top-right-radius:10px;border-bottom-right-radius:10px}
+  .pill{background:var(--chip2);border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:3px 8px;font-size:.75rem}
+  .footer{color:#89a1ca;font-size:.85rem;margin:28px 0 40px}
+  .copybtn{margin-top:8px;font-size:.8rem;border-color:#2a3e6a}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>MWZ Schematics Finder</h1>
+      <div class="sub">Select a schematic (recipe, formula, diagram, or plans) to see where it drops. Data sourced from a community guide; always verify in-game.
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search (e.g., Ray Gun, orange zone, Act 2)…" />
+        <select id="category">
+          <option value="">All categories</option>
+          <option>Aether Tools</option>
+          <option>Aetherium Crystals</option>
+          <option>Perk Colas</option>
+          <option>Ammo Mods</option>
+          <option>Wonder Weapons</option>
+          <option>Classified Items</option>
+        </select>
+        <select id="acq">
+          <option value="">All acquisition</option>
+          <option>Story mission</option>
+          <option>White zone (T1)</option>
+          <option>Orange zone (T2)</option>
+          <option>Red zone (T3)</option>
+          <option>Dark Aether 1 (T5)</option>
+          <option>Dark Aether 2 (T5)</option>
+          <option>Dark Aether 3 (T5)</option>
+          <option>Dark Aether 4 (T5)</option>
+          <option>Greylorm boss</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="viewtoggle">
+      <span class="sub">View:</span>
+      <button id="cardsBtn" aria-pressed="true">Cards</button>
+      <button id="tableBtn" aria-pressed="false">Table</button>
+    </div>
+
+    <section id="cards" class="grid" aria-live="polite"></section>
+
+    <section id="tableWrap" class="hidden" aria-live="polite">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Acquisition / Where to find</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <p class="footer">Tip: Click a card to expand details. Use the filters above or the search box to narrow it down. You can copy a location summary to share in your Discord.
+    </p>
+  </main>
+
+<script>
+// Minimal dataset built from the referenced guide. Image URLs are public Steam CDN.
+const DATA = [
+  // --- Aether Tools ---
+  {name:'Uncommon Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:'https://images.steamusercontent.com/ugc/13085541462243889726/379594D6E7B21F31011FA7FA7BBE6CA23A8A3588/'},
+  {name:'Rare Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 2, Tier 5', acqTags:['Story mission','Act 2','Tier 5'], img:''},
+  {name:'Epic Aether Tool', cat:'Aether Tools', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+  {name:'Legendary Aether Tool', cat:'Aether Tools', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
+
+  // --- Aetherium Crystals ---
+  {name:'Raw Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+  {name:'Refined Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+  {name:'Flawless Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
+
+  // --- Perk Colas ---
+  {name:'Deadshot Daiquiri', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
+  {name:'Death Perception', cat:'Perk Colas', acq:'Story mission — Act 3, Tier 1', acqTags:['Story mission','Act 3','Tier 1'], img:''},
+  {name:'Elemental Pop', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+  {name:'Jugger-Nog', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+  {name:'PHD Flopper', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+  {name:'Quick Revive', cat:'Perk Colas', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:''},
+  {name:'Speed Cola', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
+  {name:'Stamin-Up', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
+  {name:'Tombstone Soda', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+
+  // --- Ammo Mods ---
+  {name:'Brain Rot', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
+  {name:'Cryo Freeze', cat:'Ammo Mods', acq:'Story mission — Act 2, Tier 2', acqTags:['Story mission','Act 2','Tier 2'], img:''},
+  {name:'Dead Wire', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+  {name:'Napalm Burst', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
+  {name:'Shatter Blast', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+
+  // --- Wonder Weapons ---
+  {name:'Ray Gun Case', cat:'Wonder Weapons', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+  {name:'The Scorcher Case', cat:'Wonder Weapons', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
+  {name:'V-R11 Case', cat:'Wonder Weapons', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
+  {name:'Wunderwaffe DG-2 Case', cat:'Wonder Weapons', acq:'Story mission — Act 3, Tier 4', acqTags:['Story mission','Act 3','Tier 4'], img:''},
+
+  // --- Classified Items ---
+  {name:'Aether Blade Case', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
+  {name:'Dog Bone', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
+  {name:'Golden Armor Plate', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
+  {name:'Blood Burner Keys', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
+  {name:'Mag of Holding', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
+  {name:'Golden Mask Filter', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
+  {name:'Dead Wire Detonators', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
+  {name:"Sergeant's Beret", cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
+  {name:'Disciple Bottle', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:''},
+  {name:'Grenade Bandolier', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:''}
+];
+
+const cards = document.getElementById('cards');
+const tbody = document.getElementById('tbody');
+const search = document.getElementById('search');
+const category = document.getElementById('category');
+const acq = document.getElementById('acq');
+const cardsBtn = document.getElementById('cardsBtn');
+const tableBtn = document.getElementById('tableBtn');
+const tableWrap = document.getElementById('tableWrap');
+
+function match(item){
+  const q = search.value.trim().toLowerCase();
+  const catOk = !category.value || item.cat === category.value;
+  const acqMap = {
+    'Story mission':'story',
+    'White zone (T1)':'white',
+    'Orange zone (T2)':'orange',
+    'Red zone (T3)':'red',
+    'Dark Aether 1 (T5)':'da1',
+    'Dark Aether 2 (T5)':'da2',
+    'Dark Aether 3 (T5)':'da3',
+    'Dark Aether 4 (T5)':'da4',
+    'Greylorm boss':'greylorm'
+  };
+  const hasAcq = !acq.value || item.acq.includes(acq.value.replace(/ \(T\d\)/,'')) || item.acqTags?.some(t=>t.toLowerCase().includes(acq.value.toLowerCase()));
+  const text = `${item.name} ${item.cat} ${item.acq}`.toLowerCase();
+  return catOk && hasAcq && (!q || text.includes(q));
+}
+
+function render(){
+  // cards
+  cards.innerHTML = '';
+  DATA.filter(match).forEach((item, idx)=>{
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.tabIndex = 0;
+    card.innerHTML = `
+      <div class="thumb" style="background-image:url('${item.img||''}')" role="img" aria-label="${item.name}"></div>
+      <div class="meta">
+        <div class="name">${item.name}</div>
+        <div class="cat">${item.cat}</div>
+        <div class="chiprow">${(item.acqTags||[]).map(t=>`<span class='chip'>${t}</span>`).join('')}</div>
+        <div class="details"><div class="loc">${item.acq}</div>
+          <button class="copybtn" data-i="${idx}">Copy location</button>
+        </div>
+      </div>`;
+    card.addEventListener('click',()=>card.classList.toggle('active'));
+    card.addEventListener('keypress',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.classList.toggle('active'); }});
+    cards.appendChild(card);
+  });
+
+  // table
+  tbody.innerHTML = '';
+  DATA.filter(match).forEach(item=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${item.name}</strong></td>
+      <td><span class="pill">${item.cat}</span></td>
+      <td>${item.acq}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+addEventListener('click', (e)=>{
+  if(e.target.matches('.copybtn')){
+    const i = +e.target.dataset.i;
+    const it = DATA[i];
+    const text = `${it.name} — ${it.acq}`;
+    navigator.clipboard?.writeText(text);
+    e.target.textContent = 'Copied!';
+    setTimeout(()=>e.target.textContent='Copy location', 1200);
+  }
+});
+
+search.addEventListener('input', render);
+category.addEventListener('change', render);
+acq.addEventListener('change', render);
+
+cardsBtn.addEventListener('click', ()=>{
+  cardsBtn.setAttribute('aria-pressed','true');
+  tableBtn.setAttribute('aria-pressed','false');
+  cards.classList.remove('hidden');
+  tableWrap.classList.add('hidden');
+});
+
+tableBtn.addEventListener('click', ()=>{
+  tableBtn.setAttribute('aria-pressed','true');
+  cardsBtn.setAttribute('aria-pressed','false');
+  cards.classList.add('hidden');
+  tableWrap.classList.remove('hidden');
+});
+
+render();
+</script>
+</body>
+</html>
