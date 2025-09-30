@@ -108,148 +108,138 @@
   </main>
 
 <script>
-// Minimal dataset built from the referenced guide. Image URLs are public Steam CDN.
-const DATA = [
-  // --- Aether Tools ---
-  {name:'Uncommon Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:'https://images.steamusercontent.com/ugc/13085541462243889726/379594D6E7B21F31011FA7FA7BBE6CA23A8A3588/'},
-  {name:'Rare Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 2, Tier 5', acqTags:['Story mission','Act 2','Tier 5'], img:''},
-  {name:'Epic Aether Tool', cat:'Aether Tools', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
-  {name:'Legendary Aether Tool', cat:'Aether Tools', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
+(function(){
+  // Complete dataset with Steam CDN URLs
+  var DATA = [
+    {name:'Uncommon Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:'https://images.steamusercontent.com/ugc/13085541462243889726/379594D6E7B21F31011FA7FA7BBE6CA23A8A3588/'},
+    {name:'Rare Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 2, Tier 5', acqTags:['Story mission','Act 2','Tier 5'], img:'https://images.steamusercontent.com/ugc/17794544790736044605/CF6826EF7A725B7482C1A69A2D2FCFE4840D3D66/'},
+    {name:'Epic Aether Tool', cat:'Aether Tools', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/12649723166145387066/94AE8EDDD330AFFD84BE5A3BDC480D43A576949F/'},
+    {name:'Legendary Aether Tool', cat:'Aether Tools', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:'https://images.steamusercontent.com/ugc/17447789859968433904/C805183F8B55A6FD893CB85AD547AC3DAD927029/'},
 
-  // --- Aetherium Crystals ---
-  {name:'Raw Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
-  {name:'Refined Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
-  {name:'Flawless Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
+    {name:'Raw Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:'https://images.steamusercontent.com/ugc/12148669807772192274/4DB3A22C1FC48477442A27B3D82DC7705B6B88C0/'},
+    {name:'Refined Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/9516386938001031001/7561A859DD086604B8575A36C3E5E84912EB55DD/'},
+    {name:'Flawless Aetherium Crystal', cat:'Aetherium Crystals', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:'https://images.steamusercontent.com/ugc/11217944437871377431/53A8AA017B7CCA0166A393F8EAAAAB61D1D85EE8/'},
 
-  // --- Perk Colas ---
-  {name:'Deadshot Daiquiri', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
-  {name:'Death Perception', cat:'Perk Colas', acq:'Story mission — Act 3, Tier 1', acqTags:['Story mission','Act 3','Tier 1'], img:''},
-  {name:'Elemental Pop', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
-  {name:'Jugger-Nog', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
-  {name:'PHD Flopper', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
-  {name:'Quick Revive', cat:'Perk Colas', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:''},
-  {name:'Speed Cola', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
-  {name:'Stamin-Up', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
-  {name:'Tombstone Soda', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
+    {name:'Deadshot Daiquiri', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:'https://images.steamusercontent.com/ugc/15937529184432776131/67F85DBB980114E358637A9E769A8E62193B643E/'},
+    {name:'Death Perception', cat:'Perk Colas', acq:'Story mission — Act 3, Tier 1', acqTags:['Story mission','Act 3','Tier 1'], img:'https://images.steamusercontent.com/ugc/11672543452473154585/B73316FA181E533BC9B495C542921637CFB4869D/'},
+    {name:'Elemental Pop', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/11519478835419114792/D4E9F910F23A1349CF956A2CD43C279F3C1676A6/'},
+    {name:'Jugger-Nog', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:'https://images.steamusercontent.com/ugc/13328087377255472009/34C4E99EA84A4FB0BC090D4D11EB6A700567273E/'},
+    {name:'PHD Flopper', cat:'Perk Colas', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:'https://images.steamusercontent.com/ugc/10698496534727402177/8B856038B1FFD8331D6406C02299B408B2624AE4/'},
+    {name:'Quick Revive', cat:'Perk Colas', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:'https://images.steamusercontent.com/ugc/11229616197845247992/53F6FBA2B4C39FF76702928AC3537434BD3AAFD6/'},
+    {name:'Speed Cola', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:'https://images.steamusercontent.com/ugc/12073242544463804534/B5C3FC12677C21F0186031BC2701B6CE44C80C58/'},
+    {name:'Stamin-Up', cat:'Perk Colas', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:'https://images.steamusercontent.com/ugc/16577726588430935447/93DB3F59AAC10C100B1B105EA26112312EF78C80/'},
+    {name:'Tombstone Soda', cat:'Perk Colas', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/17674875046861612384/BC52D70CBCE2E5730309BE033419178D9C255A7D/'},
 
-  // --- Ammo Mods ---
-  {name:'Brain Rot', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
-  {name:'Cryo Freeze', cat:'Ammo Mods', acq:'Story mission — Act 2, Tier 2', acqTags:['Story mission','Act 2','Tier 2'], img:''},
-  {name:'Dead Wire', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
-  {name:'Napalm Burst', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:''},
-  {name:'Shatter Blast', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:''},
+    {name:'Brain Rot', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:'https://images.steamusercontent.com/ugc/12955041279711260667/6C8401AA59B8629DD91586B8450CA28F28F46C65/'},
+    {name:'Cryo Freeze', cat:'Ammo Mods', acq:'Story mission — Act 2, Tier 2', acqTags:['Story mission','Act 2','Tier 2'], img:'https://images.steamusercontent.com/ugc/13290017946266168796/08C361FEB0C67D1D509919DF31D43A056C350E49/'},
+    {name:'Dead Wire', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:'https://images.steamusercontent.com/ugc/11349973370018848093/9AB2043A47E21B1EBC2A8905676325966F86D897/'},
+    {name:'Napalm Burst', cat:'Ammo Mods', acq:'Random reward of a white zone contract (T1)', acqTags:['White zone (T1)','Contracts'], img:'https://images.steamusercontent.com/ugc/15622016803252555247/B88F6589B258F31658CDECA83A1E77D1FF47D87C/'},
+    {name:'Shatter Blast', cat:'Ammo Mods', acq:'Random reward of an orange zone contract (T2)', acqTags:['Orange zone (T2)','Contracts'], img:'https://images.steamusercontent.com/ugc/17216238318523597390/1BCEFC6ACBC1F183B47E4EBA8D6B46500D8E23B6/'},
 
-  // --- Wonder Weapons ---
-  {name:'Ray Gun Case', cat:'Wonder Weapons', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:''},
-  {name:'The Scorcher Case', cat:'Wonder Weapons', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:''},
-  {name:'V-R11 Case', cat:'Wonder Weapons', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
-  {name:'Wunderwaffe DG-2 Case', cat:'Wonder Weapons', acq:'Story mission — Act 3, Tier 4', acqTags:['Story mission','Act 3','Tier 4'], img:''},
+    {name:'Ray Gun Case', cat:'Wonder Weapons', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/14419486811825832340/60C1120DC4F54649F2E0912B34116175C8833508/'},
+    {name:'The Scorcher Case', cat:'Wonder Weapons', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:'https://images.steamusercontent.com/ugc/13659498829687348615/DC78AF1C7A5493E0871D7AA27D4A8AA3624E89E6/'},
+    {name:'V-R11 Case', cat:'Wonder Weapons', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:'https://images.steamusercontent.com/ugc/15795023361976831455/8BBFF87FCDFEDAF3F0157811D7547A6E75066716/'},
+    {name:'Wunderwaffe DG-2 Case', cat:'Wonder Weapons', acq:'Story mission — Act 3, Tier 4', acqTags:['Story mission','Act 3','Tier 4'], img:'https://images.steamusercontent.com/ugc/15401986743534693801/5AF454B7668E07C1425FD9E83BDF12C8A39EF113/'},
 
-  // --- Classified Items ---
-  {name:'Aether Blade Case', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
-  {name:'Dog Bone', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
-  {name:'Golden Armor Plate', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:''},
-  {name:'Blood Burner Keys', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
-  {name:'Mag of Holding', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:''},
-  {name:'Golden Mask Filter', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
-  {name:'Dead Wire Detonators', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
-  {name:"Sergeant's Beret", cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:''},
-  {name:'Disciple Bottle', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:''},
-  {name:'Grenade Bandolier', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:''}
-];
+    {name:'Aether Blade Case', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:'https://images.steamusercontent.com/ugc/18053656681196260130/433ABB66CE36EDDC16DA3848E87D000A21E6CCCE/'},
+    {name:'Dog Bone', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:'https://images.steamusercontent.com/ugc/14119074859376147101/6101CEB661D3CB0AF5C062F6F855917EA2A5B347/'},
+    {name:'Golden Armor Plate', cat:'Classified Items', acq:'Random reward of the Dark Aether 1 contract (T5)', acqTags:['Dark Aether 1 (T5)'], img:'https://images.steamusercontent.com/ugc/14903383008085545628/F1079427DFA9216743F6B4D55AC5BB1C7D568705/'},
+    {name:'Blood Burner Keys', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:'https://images.steamusercontent.com/ugc/15095988689378560035/4E9B3C0CDC590E32ECE799E5C369B83712A39F20/'},
+    {name:'Mag of Holding', cat:'Classified Items', acq:'Random reward of the Dark Aether 2 contract (T5)', acqTags:['Dark Aether 2 (T5)'], img:'https://images.steamusercontent.com/ugc/14331296373180425122/5868A3143BC186F4A8D110D6FAAD1DA64E8CDE3F/'},
+    {name:'Golden Mask Filter', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:'https://images.steamusercontent.com/ugc/13218344086172860540/7EB20660EA0393521A000249F47B5018A3AF53B1/'},
+    {name:'Dead Wire Detonators', cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:'https://images.steamusercontent.com/ugc/15791701406385533113/4D42A5F59213E3B2F4A5E8964DBEC317D4B4CD77/'},
+    {name:\"Sergeant's Beret\", cat:'Classified Items', acq:'Random reward of the Dark Aether 3 contract (T5)', acqTags:['Dark Aether 3 (T5)'], img:'https://images.steamusercontent.com/ugc/16525375522908286844/C52C15FC6780142E647D7DC1AAB8E589075511EC/'},
+    {name:'Disciple Bottle', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:'https://images.steamusercontent.com/ugc/17582864532730153760/BF2441C8A06152DF94956D7E2454C6334390E6B2/'},
+    {name:'Grenade Bandolier', cat:'Classified Items', acq:'Random reward of the Dark Aether 4 contract (T5)', acqTags:['Dark Aether 4 (T5)'], img:'https://images.steamusercontent.com/ugc/10489910979727688761/4D918D3CA9F52F5B99911B55F846D3B91A34D620/'}
+  ];
 
-const cards = document.getElementById('cards');
-const tbody = document.getElementById('tbody');
-const search = document.getElementById('search');
-const category = document.getElementById('category');
-const acq = document.getElementById('acq');
-const cardsBtn = document.getElementById('cardsBtn');
-const tableBtn = document.getElementById('tableBtn');
-const tableWrap = document.getElementById('tableWrap');
+  var cards = document.getElementById('cards');
+  var tbody = document.getElementById('tbody');
+  var search = document.getElementById('search');
+  var category = document.getElementById('category');
+  var acq = document.getElementById('acq');
+  var cardsBtn = document.getElementById('cardsBtn');
+  var tableBtn = document.getElementById('tableBtn');
+  var tableWrap = document.getElementById('tableWrap');
 
-function match(item){
-  const q = search.value.trim().toLowerCase();
-  const catOk = !category.value || item.cat === category.value;
-  const acqMap = {
-    'Story mission':'story',
-    'White zone (T1)':'white',
-    'Orange zone (T2)':'orange',
-    'Red zone (T3)':'red',
-    'Dark Aether 1 (T5)':'da1',
-    'Dark Aether 2 (T5)':'da2',
-    'Dark Aether 3 (T5)':'da3',
-    'Dark Aether 4 (T5)':'da4',
-    'Greylorm boss':'greylorm'
-  };
-  const hasAcq = !acq.value || item.acq.includes(acq.value.replace(/ \(T\d\)/,'')) || item.acqTags?.some(t=>t.toLowerCase().includes(acq.value.toLowerCase()));
-  const text = `${item.name} ${item.cat} ${item.acq}`.toLowerCase();
-  return catOk && hasAcq && (!q || text.includes(q));
-}
+  var FALLBACK = 'data:image/svg+xml;utf8,'+
+    encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"400\"><rect width=\"100%\" height=\"100%\" fill=\"#0f1628\"/><g fill=\"#2c3e66\" font-family=\"Arial, Helvetica, sans-serif\" font-size=\"24\" text-anchor=\"middle\"><text x=\"50%\" y=\"50%\">No Image</text></g></svg>');
 
-function render(){
-  // cards
-  cards.innerHTML = '';
-  DATA.filter(match).forEach((item, idx)=>{
-    const card = document.createElement('article');
-    card.className = 'card';
-    card.tabIndex = 0;
-    card.innerHTML = `
-      <div class="thumb" style="background-image:url('${item.img||''}')" role="img" aria-label="${item.name}"></div>
-      <div class="meta">
-        <div class="name">${item.name}</div>
-        <div class="cat">${item.cat}</div>
-        <div class="chiprow">${(item.acqTags||[]).map(t=>`<span class='chip'>${t}</span>`).join('')}</div>
-        <div class="details"><div class="loc">${item.acq}</div>
-          <button class="copybtn" data-i="${idx}">Copy location</button>
-        </div>
-      </div>`;
-    card.addEventListener('click',()=>card.classList.toggle('active'));
-    card.addEventListener('keypress',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.classList.toggle('active'); }});
-    cards.appendChild(card);
-  });
-
-  // table
-  tbody.innerHTML = '';
-  DATA.filter(match).forEach(item=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${item.name}</strong></td>
-      <td><span class="pill">${item.cat}</span></td>
-      <td>${item.acq}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-addEventListener('click', (e)=>{
-  if(e.target.matches('.copybtn')){
-    const i = +e.target.dataset.i;
-    const it = DATA[i];
-    const text = `${it.name} — ${it.acq}`;
-    navigator.clipboard?.writeText(text);
-    e.target.textContent = 'Copied!';
-    setTimeout(()=>e.target.textContent='Copy location', 1200);
+  function match(item){
+    var q = (search.value||'').trim().toLowerCase();
+    var catOk = !category.value || item.cat === category.value;
+    var tags = (item.acqTags||[]).join(' ').toLowerCase();
+    var hasAcq = !acq.value || item.acq.toLowerCase().indexOf(acq.value.toLowerCase())>-1 || tags.indexOf(acq.value.toLowerCase())>-1;
+    var text = (item.name + ' ' + item.cat + ' ' + item.acq).toLowerCase();
+    return catOk && hasAcq && (!q || text.indexOf(q)>-1);
   }
-});
 
-search.addEventListener('input', render);
-category.addEventListener('change', render);
-acq.addEventListener('change', render);
+  function render(){
+    // Cards
+    cards.innerHTML = '';
+    DATA.filter(match).forEach(function(item, idx){
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.tabIndex = 0;
+      var chips = (item.acqTags||[]).map(function(t){return '<span class=\"chip\">'+t+'</span>';}).join('');
+      var imgSrc = item.img || FALLBACK;
+      var thumb = '<div class=\"thumb\"><img alt=\"'+item.name+'\" src=\"'+imgSrc+'\" onerror=\"this.src=\\''+FALLBACK+'\\'\"/></div>';
+      card.innerHTML = thumb +
+        '<div class=\"meta\">'+
+          '<div class=\"name\">'+item.name+'</div>'+
+          '<div class=\"cat\">'+item.cat+'</div>'+
+          '<div class=\"chiprow\">'+chips+'</div>'+
+          '<div class=\"details\"><div class=\"loc\">'+item.acq+'</div>'+
+            '<button class=\"copybtn\" data-i=\"'+idx+'\">Copy location</button>'+
+          '</div>'+
+        '</div>';
+      card.addEventListener('click',function(){ card.classList.toggle('active'); });
+      card.addEventListener('keypress',function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.classList.toggle('active'); }});
+      cards.appendChild(card);
+    });
 
-cardsBtn.addEventListener('click', ()=>{
-  cardsBtn.setAttribute('aria-pressed','true');
-  tableBtn.setAttribute('aria-pressed','false');
-  cards.classList.remove('hidden');
-  tableWrap.classList.add('hidden');
-});
+    // Table
+    tbody.innerHTML = '';
+    DATA.filter(match).forEach(function(item){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><strong>'+item.name+'</strong></td>'+
+                     '<td><span class=\"pill\">'+item.cat+'</span></td>'+
+                     '<td>'+item.acq+'</td>';
+      tbody.appendChild(tr);
+    });
+  }
 
-tableBtn.addEventListener('click', ()=>{
-  tableBtn.setAttribute('aria-pressed','true');
-  cardsBtn.setAttribute('aria-pressed','false');
-  cards.classList.add('hidden');
-  tableWrap.classList.remove('hidden');
-});
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.classList.contains('copybtn')){
+      var i = parseInt(e.target.getAttribute('data-i'),10);
+      var it = DATA[i];
+      var txt = it.name + ' — ' + it.acq;
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt); }
+      e.target.textContent = 'Copied!';
+      setTimeout(function(){ e.target.textContent = 'Copy location'; }, 1200);
+    }
+  });
 
-render();
+  search.addEventListener('input', render);
+  category.addEventListener('change', render);
+  acq.addEventListener('change', render);
+
+  cardsBtn.addEventListener('click', function(){
+    cardsBtn.setAttribute('aria-pressed','true');
+    tableBtn.setAttribute('aria-pressed','false');
+    cards.classList.remove('hidden');
+    tableWrap.classList.add('hidden');
+  });
+
+  tableBtn.addEventListener('click', function(){
+    tableBtn.setAttribute('aria-pressed','true');
+    cardsBtn.setAttribute('aria-pressed','false');
+    cards.classList.add('hidden');
+    tableWrap.classList.remove('hidden');
+  });
+
+  render();
+})();
 </script>
 </body>
 </html>
