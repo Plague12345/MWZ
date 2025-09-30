@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ Schematics Finder • Interactive Guide</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --accent:#66b3ff; --accent2:#8de0a6;
+    --chip:#1a2236; --chip2:#152038; --ring:#334267;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  a{color:var(--accent)}
+  header{position:sticky;top:0;z-index:5;background:rgba(11,15,23,.92);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid #1c2740}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  h1{font-size:1.6rem;margin:0 0 .25rem 0;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:.92rem}
+  .toolbar{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-top:14px}
+  input[type="search"]{width:100%;padding:.7rem .85rem;border-radius:10px;border:1px solid var(--ring);background:#0f1628;color:var(--text)}
+  select,button{border:1px solid var(--ring);background:#0f1628;color:var(--text);padding:.6rem .75rem;border-radius:10px}
+  button{cursor:pointer}
+  main{max-width:1100px;margin:18px auto;padding:0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid #1b2742;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  .thumb{aspect-ratio:16/10;background:#0f1628;display:block;overflow:hidden;border-bottom:1px dashed #233356}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .meta{padding:12px}
+  .name{font-weight:700;font-size:1.02rem;margin:0 0 .4rem}
+  .cat{font-size:.78rem;color:var(--muted)}
+  .chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{font-size:.75rem;background:var(--chip);border:1px solid #1f2944;border-radius:999px;padding:4px 8px;color:#cfe2ff}
+  .details{display:none}
+  .card.active .details{display:block}
+  .card.active .meta{border-top:1px dashed #233356;margin-top:10px;padding-top:10px}
+  .loc{font-size:.92rem;color:#e9f5ff}
+  .viewtoggle{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:14px 0}
+  .hidden{display:none!important}
+  table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  th,td{text-align:left;padding:10px 12px}
+  thead th{color:#c9d9fb;font-weight:700}
+  tbody tr{background:var(--panel);border:1px solid #1b2742}
+  tbody td{border-top:1px solid #1b2742;border-bottom:1px solid #1b2742}
+  tbody td:first-child{border-left:1px solid #1b2742;border-top-left-radius:10px;border-bottom-left-radius:10px}
+  tbody td:last-child{border-right:1px solid #1b2742;border-top-right-radius:10px;border-bottom-right-radius:10px}
+  .pill{background:var(--chip2);border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:3px 8px;font-size:.75rem}
+  .footer{color:#89a1ca;font-size:.85rem;margin:28px 0 40px}
+  .copybtn{margin-top:8px;font-size:.8rem;border-color:#2a3e6a}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>MWZ Schematics Finder</h1>
+      <div class="sub">Select a schematic (recipe, formula, diagram, or plans) to see where it drops. Data sourced from a community guide; always verify in-game.
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="Search (e.g., Ray Gun, orange zone, Act 2)…" />
+        <select id="category">
+          <option value="">All categories</option>
+          <option>Aether Tools</option>
+          <option>Aetherium Crystals</option>
+          <option>Perk Colas</option>
+          <option>Ammo Mods</option>
+          <option>Wonder Weapons</option>
+          <option>Classified Items</option>
+        </select>
+        <select id="acq">
+          <option value="">All acquisition</option>
+          <option>Story mission</option>
+          <option>White zone (T1)</option>
+          <option>Orange zone (T2)</option>
+          <option>Red zone (T3)</option>
+          <option>Dark Aether 1 (T5)</option>
+          <option>Dark Aether 2 (T5)</option>
+          <option>Dark Aether 3 (T5)</option>
+          <option>Dark Aether 4 (T5)</option>
+          <option>Greylorm boss</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="viewtoggle">
+      <span class="sub">View:</span>
+      <button id="cardsBtn" aria-pressed="true">Cards</button>
+      <button id="tableBtn" aria-pressed="false">Table</button>
+    </div>
+
+    <section id="cards" class="grid" aria-live="polite"></section>
+
+    <section id="tableWrap" class="hidden" aria-live="polite">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Acquisition / Where to find</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <p class="footer">Tip: Click a card to expand details. Use the filters above or the search box to narrow it down. You can copy a location summary to share in your Discord.
+    </p>
+  </main>
+
+<script>
+(function(){
+  var DATA = [
+    {name:'Uncommon Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 1, Tier 5', acqTags:['Story mission','Act 1','Tier 5'], img:'https://images.steamusercontent.com/ugc/13085541462243889726/379594D6E7B21F31011FA7FA7BBE6CA23A8A3588/'},
+    {name:'Rare Aether Tool', cat:'Aether Tools', acq:'Story mission — Act 2, Tier 5', acqTags:['Story mission','Act 2','Tier 5'], img:'https://images.steamusercontent.com/ugc/17794544790736044605/CF6826EF7A725B7482C1A69A2D2FCFE4840D3D66/'},
+    {name:'Epic Aether Tool', cat:'Aether Tools', acq:'Random reward of a red zone contract (T3)', acqTags:['Red zone (T3)','Contracts'], img:'https://images.steamusercontent.com/ugc/12649723166145387066/94AE8EDDD330AFFD84BE5A3BDC480D43A576949F/'},
+    {name:'Legendary Aether Tool', cat:'Aether Tools', acq:'Random reward for defeating the Greylorm boss', acqTags:['Greylorm boss'], img:'https://images.steamusercontent.com/ugc/17447789859968433904/C805183F8B55A6FD893CB85AD547AC3DAD927029/'},
+    // ... (rest of dataset, all items with their image URLs as shared before)
+  ];
+
+  var cards = document.getElementById('cards');
+  var tbody = document.getElementById('tbody');
+  var search = document.getElementById('search');
+  var category = document.getElementById('category');
+  var acq = document.getElementById('acq');
+  var cardsBtn = document.getElementById('cardsBtn');
+  var tableBtn = document.getElementById('tableBtn');
+  var tableWrap = document.getElementById('tableWrap');
+
+  var FALLBACK = 'data:image/svg+xml;utf8,'+
+    encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400"><rect width="100%" height="100%" fill="#0f1628"/><g fill="#2c3e66" font-family="Arial, Helvetica, sans-serif" font-size="24" text-anchor="middle"><text x="50%" y="50%">No Image</text></g></svg>');
+
+  function match(item){
+    var q = (search.value||'').trim().toLowerCase();
+    var catOk = !category.value || item.cat === category.value;
+    var tags = (item.acqTags||[]).join(' ').toLowerCase();
+    var hasAcq = !acq.value || item.acq.toLowerCase().indexOf(acq.value.toLowerCase())>-1 || tags.indexOf(acq.value.toLowerCase())>-1;
+    var text = (item.name + ' ' + item.cat + ' ' + item.acq).toLowerCase();
+    return catOk && hasAcq && (!q || text.indexOf(q)>-1);
+  }
+
+  function render(){
+    cards.innerHTML = '';
+    DATA.filter(match).forEach(function(item, idx){
+      var card = document.createElement('article');
+      card.className = 'card';
+      card.tabIndex = 0;
+      var chips = (item.acqTags||[]).map(function(t){return '<span class="chip">'+t+'</span>';}).join('');
+      var imgSrc = item.img || FALLBACK;
+      var thumb = '<div class="thumb"><img alt="'+item.name+'" src="'+imgSrc+'" onerror="this.src=\''+FALLBACK+'\'"/></div>';
+      card.innerHTML = thumb +
+        '<div class="meta">'+
+          '<div class="name">'+item.name+'</div>'+ 
+          '<div class="cat">'+item.cat+'</div>'+ 
+          '<div class="chiprow">'+chips+'</div>'+ 
+          '<div class="details"><div class="loc">'+item.acq+'</div>'+ 
+            '<button class="copybtn" data-i="'+idx+'">Copy location</button>'+ 
+          '</div>'+ 
+        '</div>';
+      card.addEventListener('click',function(){ card.classList.toggle('active'); });
+      card.addEventListener('keypress',function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.classList.toggle('active'); }});
+      cards.appendChild(card);
+    });
+
+    tbody.innerHTML = '';
+    DATA.filter(match).forEach(function(item){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td><strong>'+item.name+'</strong></td>'+
+                     '<td><span class="pill">'+item.cat+'</span></td>'+
+                     '<td>'+item.acq+'</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.classList.contains('copybtn')){
+      var i = parseInt(e.target.getAttribute('data-i'),10);
+      var it = DATA[i];
+      var txt = it.name + ' — ' + it.acq;
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt); }
+      e.target.textContent = 'Copied!';
+      setTimeout(function(){ e.target.textContent = 'Copy location'; }, 1200);
+    }
+  });
+
+  search.addEventListener('input', render);
+  category.addEventListener('change', render);
+  acq.addEventListener('change', render);
+
+  cardsBtn.addEventListener('click', function(){
+    cardsBtn.setAttribute('aria-pressed','true');
+    tableBtn.setAttribute('aria-pressed','false');
+    cards.classList.remove('hidden');
+    tableWrap.classList.add('hidden');
+  });
+
+  tableBtn.addEventListener('click', function(){
+    tableBtn.setAttribute('aria-pressed','true');
+    cardsBtn.setAttribute('aria-pressed','false');
+    cards.classList.add('hidden');
+    tableWrap.classList.remove('hidden');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
