@@ -161,7 +161,7 @@ function renderRows(rows){
   tbody.innerHTML = '';
   rows.forEach(r=>{
     const imgTag = r.img
-      ? `<img src="${r.img}" alt="${r.name}" style="height:40px;width:auto;border-radius:6px;">`
+      ? `<img src="${r.img}" alt="${r.name}" style="height:40px;width:auto;border-radius:40px;">`
       : '';
     const tr = document.createElement('tr');
     tr.innerHTML =
