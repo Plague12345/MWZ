@@ -29,7 +29,7 @@
   button{cursor:pointer}
   .results{margin-top:12px}
   table{width:100%;border-collapse:separate;border-spacing:0 8px}
-  th,td{text-align:left;padding:10px 12px}
+  th,td{text-align:left;padding:10px 12px;vertical-align:middle}
   thead th{color:#c9d9fb}
   tbody tr{background:#101726;border:1px solid #1b2742}
   tbody td{border-top:1px solid #1b2742;border-bottom:1px solid #1b2742}
@@ -40,6 +40,13 @@
   .pill.t2{background:rgba(227,155,42,.15);border-color:rgba(227,155,42,.5);color:#ffe3bf}
   .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
   .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
+  .noteimg{height:84px;width:auto;border-radius:8px;margin-left:8px;cursor:pointer;vertical-align:middle}
+  /* Lightbox */
+  #imgModal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.7);z-index:50}
+  #imgModal.open{display:grid}
+  #imgModal img{max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #imgModal .close{position:absolute;top:12px;right:14px;background:#0f1628;color:#e6eefc;
+    border:1px solid #334267;padding:.45rem .65rem;border-radius:10px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -49,7 +56,7 @@
       <img src="Plaguesmwzserver.png" alt="Plague's MWZ Server">
       <div>
         <h1>MWZ • Teleportal Finder</h1>
-        <div class="sub">Enter your grid (e.g., <strong>F4</strong>). I’ll return the nearest Teleportal entry and color its zone automatically (T1/T2/T3).</div>
+        <div class="sub">Enter your grid (e.g., <strong>F4</strong>). I’ll return the nearest Teleportal entry and auto-color its zone (T1/T2/T3).</div>
       </div>
     </div>
   </div>
@@ -85,46 +92,44 @@
 
     <div class="results">
       <table>
-        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Image</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="hint">
-        Want to adjust zones? Edit <strong>ZONE_MAP</strong> in the script — anything not listed becomes White (T1) automatically.
-      </div>
+      <div class="hint">Drop thumbnails into <code>/images/portals/</code> named after the grid (e.g. <code>b2_thumb.png</code>, <code>b2_full.png</code>).</div>
     </div>
   </div>
 </main>
 
+<!-- Lightbox -->
+<div id="imgModal" aria-hidden="true">
+  <button class="close" aria-label="Close image (Esc)">Close</button>
+  <img id="imgModalPic" alt="">
+</div>
+
 <script>
-/* --------------------- Portals (from your map) --------------------- */
+/* --------------------- Portals (16 from map) --------------------- */
 const PORTALS = [
-  {name:'Portal C1', grid:'C1', notes:'2 Story Building, Red Worm Map Room', img:'portalimages/portal_entryC1.png'},
-  {name:'Portal B2', grid:'B2', notes:''},
-  {name:'Portal C2', grid:'C2', notes:''},
-  {name:'Portal D2', grid:'D2', notes:''},
-  {name:'Portal F3', grid:'F3', notes:''},
-  {name:'Portal G4', grid:'G4', notes:''},
-  {name:'Portal E5', grid:'E5', notes:''},
-  {name:'Portal F6', grid:'F6', notes:''},
-  {name:'Portal G6', grid:'G6', notes:''},
-  {name:'Portal C3', grid:'C3', notes:''},
-  {name:'Portal B4', grid:'B4', notes:''},
-  {name:'Portal C6', grid:'C6', notes:''},
-  {name:'Portal F8', grid:'F8', notes:''},
-  {name:'Portal H8', grid:'H8', notes:''},
-  {name:'Portal I2', grid:'I2', notes:''},
-  {name:'Portal H3', grid:'H3', notes:''},
-  {name:'Portal H5', grid:'H5', notes:''},
+  {name:'Portal B2', grid:'B2', notes:'Harbor side', img:'images/portals/b2_thumb.png', imgFull:'images/portals/b2_full.png'},
+  {name:'Portal C2', grid:'C2', notes:'', img:'images/portals/c2_thumb.png', imgFull:'images/portals/c2_full.png'},
+  {name:'Portal D2', grid:'D2', notes:'', img:'images/portals/d2_thumb.png', imgFull:'images/portals/d2_full.png'},
+  {name:'Portal F3', grid:'F3', notes:'', img:'images/portals/f3_thumb.png', imgFull:'images/portals/f3_full.png'},
+  {name:'Portal G4', grid:'G4', notes:'', img:'images/portals/g4_thumb.png', imgFull:'images/portals/g4_full.png'},
+  {name:'Portal E5', grid:'E5', notes:'', img:'images/portals/e5_thumb.png', imgFull:'images/portals/e5_full.png'},
+  {name:'Portal F6', grid:'F6', notes:'', img:'images/portals/f6_thumb.png', imgFull:'images/portals/f6_full.png'},
+  {name:'Portal G6', grid:'G6', notes:'', img:'images/portals/g6_thumb.png', imgFull:'images/portals/g6_full.png'},
+  {name:'Portal C3', grid:'C3', notes:'', img:'images/portals/c3_thumb.png', imgFull:'images/portals/c3_full.png'},
+  {name:'Portal B4', grid:'B4', notes:'', img:'images/portals/b4_thumb.png', imgFull:'images/portals/b4_full.png'},
+  {name:'Portal C6', grid:'C6', notes:'', img:'images/portals/c6_thumb.png', imgFull:'images/portals/c6_full.png'},
+  {name:'Portal F8', grid:'F8', notes:'', img:'images/portals/f8_thumb.png', imgFull:'images/portals/f8_full.png'},
+  {name:'Portal H8', grid:'H8', notes:'', img:'images/portals/h8_thumb.png', imgFull:'images/portals/h8_full.png'},
+  {name:'Portal I2', grid:'I2', notes:'', img:'images/portals/i2_thumb.png', imgFull:'images/portals/i2_full.png'},
+  {name:'Portal H3', grid:'H3', notes:'', img:'images/portals/h3_thumb.png', imgFull:'images/portals/h3_full.png'},
+  {name:'Portal H5', grid:'H5', notes:'', img:'images/portals/h5_thumb.png', imgFull:'images/portals/h5_full.png'}
 ];
 
-/* --------- Zone auto-labelling by grid (editable lookup) ---------- */
-/* Any cell in RED_MAP -> Red (T3), in ORANGE_MAP -> Orange (T2),
-   otherwise -> White (T1). I inferred these from your screenshot; tweak freely. */
-const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);       // inner crimson
-const ORANGE_MAP = new Set([
-  // ring around red — add/remove cells as needed
-  'E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7','F4','G4','E5','G5'
-]);
+/* --------- Zone auto-labelling by grid ---------- */
+const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);
+const ORANGE_MAP = new Set(['E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7']);
 
 function zoneOf(cell){
   if(RED_MAP.has(cell))    return {key:'t3', label:'Red (T3)'};
@@ -132,20 +137,16 @@ function zoneOf(cell){
   return {key:'t1', label:'White (T1)'};
 }
 
-/* ---------------------------- Helpers ------------------------------ */
-const letters = 'ABCDEFGHIJ'; // A..J
+/* ---------------- Helpers ---------------- */
+const letters = 'ABCDEFGHIJ';
 function parseGrid(s){
   if(!s) return null;
   s = s.trim().toUpperCase();
-  const m = s.match(/^([A-J])\s*-?\s*(10|[1-9])$/);
+  const m = s.match(/^([A-J])\\s*-?\\s*(10|[1-9])$/);
   if(!m) return null;
-  const col = letters.indexOf(m[1]);  // 0..9
-  const row = parseInt(m[2],10) - 1;  // 0..9
-  return {col,row,label:`${m[1]}${m[2]}`};
+  return {col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}`};
 }
-function dist(a,b){ // Manhattan steps
-  return Math.abs(a.col-b.col)+Math.abs(a.row-b.row);
-}
+function dist(a,b){ return Math.abs(a.col-b.col)+Math.abs(a.row-b.row); }
 function byNearest(from,zoneFilterKey){
   return PORTALS
     .map(p => {
@@ -161,25 +162,25 @@ function renderRows(rows){
   tbody.innerHTML = '';
   rows.forEach(r=>{
     const imgTag = r.img
-      ? `<img src="${r.img}" alt="${r.name}" style="height:40px;width:auto;border-radius:40px;">`
+      ? `<img src=\"${r.img}\" data-full=\"${r.imgFull || r.img}\" alt=\"${r.name}\" class=\"noteimg\">`
       : '';
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td><strong>${r.name}</strong></td>`+
-      `<td><span class="pill">${r.grid}</span></td>`+
-      `<td><span class="pill ${r.zone.key}">${r.zone.label}</span></td>`+
+      `<td><span class=\"pill\">${r.grid}</span></td>`+
+      `<td><span class=\"pill ${r.zone.key}\">${r.zone.label}</span></td>`+
       `<td>${typeof r.d==='number'? r.d+' grid steps':'—'}</td>`+
       `<td>${r.notes||''} ${imgTag}</td>`;
     tbody.appendChild(tr);
   });
   if(rows.length===0){
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="5">No portals match those filters.</td>`;
+    tr.innerHTML = `<td colspan=\"5\">No portals match those filters.</td>`;
     tbody.appendChild(tr);
   }
 }
 
-/* ---------------------------- UI wiring ---------------------------- */
+/* ---------------- UI wiring ---------------- */
 const input = document.getElementById('grid');
 const zone  = document.getElementById('zone');
 const limit = document.getElementById('limit');
@@ -194,9 +195,33 @@ document.getElementById('listAllBtn').addEventListener('click', ()=>{
   const rows = byNearest({col:0,row:0}, zone.value).map(r=>({...r, d: undefined}));
   renderRows(rows);
 });
-
-// initial
 renderRows([]);
+
+/* ---------------- Lightbox ---------------- */
+const modal = document.getElementById('imgModal');
+const modalPic = document.getElementById('imgModalPic');
+const modalClose = modal.querySelector('.close');
+
+document.addEventListener('click', (e)=>{
+  const el = e.target;
+  if(el.classList && el.classList.contains('noteimg')){
+    modalPic.src = el.getAttribute('data-full') || el.src;
+    modalPic.alt = el.alt || '';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+  } else if(el === modal || el === modalClose){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    modalPic.src = '';
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && modal.classList.contains('open')){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    modalPic.src = '';
+  }
+});
 </script>
 </body>
 </html>
