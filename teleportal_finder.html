@@ -95,7 +95,7 @@
         <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Image</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="hint">Drop thumbnails into <code>/images/portals/</code> named after the grid (e.g. <code>b2_thumb.png</code>, <code>b2_full.png</code>).</div>
+      <div class="hint">Drop thumbnails into <code>/images/portals/</code>. Without an image, a neutral placeholder will show instead.</div>
     </div>
   </div>
 </main>
@@ -161,21 +161,21 @@ function renderRows(rows){
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
   rows.forEach(r=>{
-    const imgTag = r.img
-      ? `<img src=\"${r.img}\" data-full=\"${r.imgFull || r.img}\" alt=\"${r.name}\" class=\"noteimg\">`
-      : '';
+    const thumb = r.img || 'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="84"><rect width="100%" height="100%" fill="#0f1628"/><text x="50%" y="50%" font-size="14" fill="#8899bb" font-family="Arial" text-anchor="middle" dominant-baseline="middle">No Image</text></svg>');
+    const full  = r.imgFull || thumb;
+    const imgTag = `<img src="${thumb}" data-full="${full}" alt="${r.name}" class="noteimg" onerror="this.src='${thumb}'">`;
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td><strong>${r.name}</strong></td>`+
-      `<td><span class=\"pill\">${r.grid}</span></td>`+
-      `<td><span class=\"pill ${r.zone.key}\">${r.zone.label}</span></td>`+
+      `<td><span class="pill">${r.grid}</span></td>`+
+      `<td><span class="pill ${r.zone.key}">${r.zone.label}</span></td>`+
       `<td>${typeof r.d==='number'? r.d+' grid steps':'—'}</td>`+
       `<td>${r.notes||''} ${imgTag}</td>`;
     tbody.appendChild(tr);
   });
   if(rows.length===0){
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan=\"5\">No portals match those filters.</td>`;
+    tr.innerHTML = `<td colspan="5">No portals match those filters.</td>`;
     tbody.appendChild(tr);
   }
 }
