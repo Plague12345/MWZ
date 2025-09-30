@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ • Teleportal Finder</title>
+<link rel="icon" href="Plaguesmwzserver.png" />
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267; --accent:#66b3ff;
+    --t1:#2a6ae3; --t2:#e39b2a; --t3:#e33a2a;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);
+       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  header{position:sticky;top:0;z-index:3;background:rgba(11,15,23,.92);backdrop-filter:blur(8px);
+         border-bottom:1px solid #1c2740}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand img{height:56px;border-radius:12px}
+  h1{margin:0;font-size:1.45rem;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:.92rem}
+  main{max-width:1100px;margin:20px auto;padding:0 18px}
+  .card{background:#101726;border:1px solid #1b2742;border-radius:16px;padding:16px}
+  .row{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin:10px 0 16px}
+  select,input,button{background:#0f1628;border:1px solid var(--ring);color:var(--text);
+                      padding:.65rem .7rem;border-radius:10px}
+  button{cursor:pointer}
+  .results{margin-top:12px}
+  table{width:100%;border-collapse:separate;border-spacing:0 8px}
+  th,td{text-align:left;padding:10px 12px}
+  thead th{color:#c9d9fb}
+  tbody tr{background:#101726;border:1px solid #1b2742}
+  tbody td{border-top:1px solid #1b2742;border-bottom:1px solid #1b2742}
+  tbody td:first-child{border-left:1px solid #1b2742;border-top-left-radius:10px;border-bottom-left-radius:10px}
+  tbody td:last-child{border-right:1px solid #1b2742;border-top-right-radius:10px;border-bottom-right-radius:10px}
+  .pill{background:#152038;border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:3px 8px;font-size:.75rem}
+  .pill.t1{background:rgba(42,106,227,.15);border-color:rgba(42,106,227,.5);color:#cfe0ff}
+  .pill.t2{background:rgba(227,155,42,.15);border-color:rgba(227,155,42,.5);color:#ffe3bf}
+  .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
+  .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <img src="Plaguesmwzserver.png" alt="Plague's MWZ Server">
+      <div>
+        <h1>MWZ • Teleportal Finder</h1>
+        <div class="sub">Enter your grid (e.g., <strong>F4</strong>). I’ll return the nearest Teleportal entry and color its zone automatically (T1/T2/T3).</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="grid"><small>Where are you?</small></label><br>
+        <input id="grid" placeholder="e.g., F4" maxlength="3" />
+      </div>
+      <div>
+        <label for="zone"><small>Zone filter (optional)</small></label><br>
+        <select id="zone">
+          <option value="">Any</option>
+          <option value="t1">White (T1)</option>
+          <option value="t2">Orange (T2)</option>
+          <option value="t3">Red (T3)</option>
+        </select>
+      </div>
+      <div>
+        <label for="limit"><small>Show top</small></label><br>
+        <select id="limit">
+          <option>1</option><option selected>3</option><option>5</option><option>10</option>
+        </select>
+      </div>
+      <div style="align-self:end;display:flex;gap:8px;">
+        <button id="findBtn">Find nearest</button>
+        <button id="listAllBtn" title="Ignore your grid; just list all portals">List all</button>
+      </div>
+    </div>
+
+    <div class="results">
+      <table>
+        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="hint">
+        Want to adjust zones? Edit <strong>ZONE_MAP</strong> in the script — anything not listed becomes White (T1) automatically.
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* --------------------- Portals (from your map) --------------------- */
+const PORTALS = [
+  {name:'Portal B2', grid:'B2', notes:''},
+  {name:'Portal C2', grid:'C2', notes:''},
+  {name:'Portal D2', grid:'D2', notes:''},
+  {name:'Portal F3', grid:'F3', notes:''},
+  {name:'Portal G4', grid:'G4', notes:''},
+  {name:'Portal E5', grid:'E5', notes:''},
+  {name:'Portal F6', grid:'F6', notes:''},
+  {name:'Portal G6', grid:'G6', notes:''},
+  {name:'Portal C3', grid:'C3', notes:''},
+  {name:'Portal B4', grid:'B4', notes:''},
+  {name:'Portal C6', grid:'C6', notes:''},
+  {name:'Portal F8', grid:'F8', notes:''},
+  {name:'Portal H8', grid:'H8', notes:''},
+  {name:'Portal I2', grid:'I2', notes:''},
+  {name:'Portal H3', grid:'H3', notes:''},
+  {name:'Portal H5', grid:'H5', notes:''},
+];
+
+/* --------- Zone auto-labelling by grid (editable lookup) ---------- */
+/* Any cell in RED_MAP -> Red (T3), in ORANGE_MAP -> Orange (T2),
+   otherwise -> White (T1). I inferred these from your screenshot; tweak freely. */
+const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);       // inner crimson
+const ORANGE_MAP = new Set([
+  // ring around red — add/remove cells as needed
+  'E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7','F4','G4','E5','G5'
+]);
+
+function zoneOf(cell){
+  if(RED_MAP.has(cell))    return {key:'t3', label:'Red (T3)'};
+  if(ORANGE_MAP.has(cell)) return {key:'t2', label:'Orange (T2)'};
+  return {key:'t1', label:'White (T1)'};
+}
+
+/* ---------------------------- Helpers ------------------------------ */
+const letters = 'ABCDEFGHIJ'; // A..J
+function parseGrid(s){
+  if(!s) return null;
+  s = s.trim().toUpperCase();
+  const m = s.match(/^([A-J])\s*-?\s*(10|[1-9])$/);
+  if(!m) return null;
+  const col = letters.indexOf(m[1]);  // 0..9
+  const row = parseInt(m[2],10) - 1;  // 0..9
+  return {col,row,label:`${m[1]}${m[2]}`};
+}
+function dist(a,b){ // Manhattan steps
+  return Math.abs(a.col-b.col)+Math.abs(a.row-b.row);
+}
+function byNearest(from,zoneFilterKey){
+  return PORTALS
+    .map(p => {
+      const pg = parseGrid(p.grid);
+      const z  = zoneOf(pg.label);
+      return {...p, zone:z, d: dist(from, pg)};
+    })
+    .filter(p => !zoneFilterKey || p.zone.key===zoneFilterKey)
+    .sort((a,b)=>a.d-b.d);
+}
+function renderRows(rows){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td><strong>${r.name}</strong></td>`+
+      `<td><span class="pill">${r.grid}</span></td>`+
+      `<td><span class="pill ${r.zone.key}">${r.zone.label}</span></td>`+
+      `<td>${typeof r.d==='number'? r.d+' grid steps':'—'}</td>`+
+      `<td>${r.notes||''}</td>`;
+    tbody.appendChild(tr);
+  });
+  if(rows.length===0){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="5">No portals match those filters.</td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+/* ---------------------------- UI wiring ---------------------------- */
+const input = document.getElementById('grid');
+const zone  = document.getElementById('zone');
+const limit = document.getElementById('limit');
+
+document.getElementById('findBtn').addEventListener('click', ()=>{
+  const g = parseGrid(input.value);
+  if(!g){ alert('Enter a valid grid like F4 (A–J with 1–10).'); return; }
+  const rows = byNearest(g, zone.value).slice(0, parseInt(limit.value,10));
+  renderRows(rows);
+});
+document.getElementById('listAllBtn').addEventListener('click', ()=>{
+  const rows = byNearest({col:0,row:0}, zone.value).map(r=>({...r, d: undefined}));
+  renderRows(rows);
+});
+
+// initial
+renderRows([]);
+</script>
+</body>
+</html>
