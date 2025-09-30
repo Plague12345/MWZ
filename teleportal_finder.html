@@ -8,14 +8,12 @@
 <style>
   :root{
     --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267; --accent:#66b3ff;
-    --t1:#2a6ae3; --t2:#e39b2a; --t3:#e33a2a;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);
        font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-  header{position:sticky;top:0;z-index:3;background:rgba(11,15,23,.92);backdrop-filter:blur(8px);
-         border-bottom:1px solid #1c2740}
+  header{position:sticky;top:0;z-index:3;background:#0b0f17e6;border-bottom:1px solid #1c2740}
   .wrap{max-width:1100px;margin:0 auto;padding:18px}
   .brand{display:flex;align-items:center;gap:14px}
   .brand img{height:56px;border-radius:12px}
@@ -23,7 +21,7 @@
   .sub{color:var(--muted);font-size:.92rem}
   main{max-width:1100px;margin:20px auto;padding:0 18px}
   .card{background:#101726;border:1px solid #1b2742;border-radius:16px;padding:16px}
-  .row{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin:10px 0 16px}
+  .row{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin:10px 0 12px}
   select,input,button{background:#0f1628;border:1px solid var(--ring);color:var(--text);
                       padding:.65rem .7rem;border-radius:10px}
   button{cursor:pointer}
@@ -41,6 +39,7 @@
   .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
   .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
   .noteimg{height:84px;width:auto;border-radius:8px;margin-left:8px;cursor:pointer;vertical-align:middle}
+  .msg{margin-top:6px;color:#ffb4b4;font-size:.9rem;min-height:1.2em}
   /* Lightbox */
   #imgModal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.7);z-index:50}
   #imgModal.open{display:grid}
@@ -68,6 +67,7 @@
       <div>
         <label for="grid"><small>Where are you?</small></label><br>
         <input id="grid" placeholder="e.g., F4" maxlength="3" />
+        <div id="msg" class="msg"></div>
       </div>
       <div>
         <label for="zone"><small>Zone filter (optional)</small></label><br>
@@ -130,7 +130,6 @@ const PORTALS = [
 /* --------- Zone auto-labelling by grid ---------- */
 const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);
 const ORANGE_MAP = new Set(['E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7']);
-
 function zoneOf(cell){
   if(RED_MAP.has(cell))    return {key:'t3', label:'Red (T3)'};
   if(ORANGE_MAP.has(cell)) return {key:'t2', label:'Orange (T2)'};
@@ -142,24 +141,26 @@ const letters = 'ABCDEFGHIJ';
 function parseGrid(s){
   if(!s) return null;
   s = s.trim().toUpperCase();
-  // ✅ correct (single backslashes in the regex literal)
+  // ✅ correct regex (no double escaping)
   const m = s.match(/^([A-J])\s*-?\s*(10|[1-9])$/);
   if(!m) return null;
-  return { col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}` };
+  return {col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}`};
 }
 function dist(a,b){ return Math.abs(a.col-b.col)+Math.abs(a.row-b.row); }
-function byNearest(from, zoneFilterKey){
+function byNearest(from,zoneFilterKey){
   return PORTALS
     .map(p => {
       const pg = parseGrid(p.grid);
-      if(!pg) return null;                      // guard bad data
+      if(!pg) return null;
       const z  = zoneOf(pg.label);
-      return { ...p, zone: z, d: Math.abs(from.col-pg.col)+Math.abs(from.row-pg.row) };
+      return {...p, zone:z, d: dist(from, pg)};
     })
-    .filter(Boolean)                            // drop nulls
+    .filter(Boolean)
     .filter(p => !zoneFilterKey || p.zone.key===zoneFilterKey)
     .sort((a,b)=>a.d-b.d);
 }
+
+/* -------------- Render + UI ---------------- */
 function renderRows(rows){
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
@@ -183,21 +184,25 @@ function renderRows(rows){
   }
 }
 
-/* ---------------- UI wiring ---------------- */
 const input = document.getElementById('grid');
 const zone  = document.getElementById('zone');
 const limit = document.getElementById('limit');
+const msg   = document.getElementById('msg');
 
 document.getElementById('findBtn').addEventListener('click', ()=>{
   const g = parseGrid(input.value);
-  if(!g){ alert('Enter a valid grid like F4 (A–J with 1–10).'); return; }
+  if(!g){ msg.textContent = 'Enter a valid grid like F4 (A–J with 1–10).'; renderRows([]); return; }
+  msg.textContent = '';
   const rows = byNearest(g, zone.value).slice(0, parseInt(limit.value,10));
   renderRows(rows);
 });
 document.getElementById('listAllBtn').addEventListener('click', ()=>{
+  msg.textContent = '';
   const rows = byNearest({col:0,row:0}, zone.value).map(r=>({...r, d: undefined}));
   renderRows(rows);
 });
+
+// initial
 renderRows([]);
 
 /* ---------------- Lightbox ---------------- */
