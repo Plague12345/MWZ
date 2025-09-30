@@ -43,7 +43,10 @@
   .pill.t2{background:rgba(227,155,42,.15);border-color:rgba(227,155,42,.5);color:#ffe3bf}
   .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
   .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
-  .note-wrap{display:flex;align-items:center;gap:8px;min-height:84px;flex-wrap:wrap}
+  .note-wrap{display:flex;align-items:center;gap:14px;min-height:84px;flex-wrap:wrap}
+  .thumbcol{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .thumbwrap{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .thumblabel{font-size:.72rem;background:#152038;border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:2px 6px}
   .noteimg{width:120px;height:84px;object-fit:cover;border-radius:8px;cursor:pointer}
   .msg{margin-top:6px;color:#ffb4b4;font-size:.9rem;min-height:1.2em}
   /* Lightbox */
@@ -115,7 +118,7 @@
         <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Images</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="hint">Each portal can have an overview + close-up image. Click any image to enlarge.</div>
+      <div class="hint">Images are loaded from <code>portalimages/GRID_*.png</code> (e.g., <code>portalimages/C1_thumb.png</code> and <code>portalimages/C1_close.png</code>). JPG is also supported.</div>
     </div>
   </div>
 
@@ -132,24 +135,12 @@
 
 <script>
 /* --------------------- Portals --------------------- */
+/* You can omit img/imgFull/imgClose — paths are inferred from GRID automatically. */
 const PORTALS = [
-  {
-    name:'Portal C1',
-    grid:'C1',
-    notes:'Rectangle Building RedWorm Map Room',
-    img:'portalimages/c1_thumb.png',
-    imgFull:'portalimages/c1_full.png',
-    imgClose:'portalimages/c1_close.jpg'
-  },
-  {
-    name:'Portal D1',
-    grid:'D1',
-    notes:'Inside Tunnel - Watch Out for Mercs',
-    img:'portalimages/D1_thumb.png',
-    imgFull:'portalimages/D1_full.png',
-    imgClose:'portalimages/D1_close.jpg'
-  },
-  // ... add rest of portals with imgClose if available
+  {name:'Portal C1', grid:'C1', notes:'Rectangle Building RedWorm Map Room'},
+  {name:'Portal D1', grid:'D1', notes:'Inside Tunnel - Watch Out for Mercs'},
+  {name:'Portal E1', grid:'E1', notes:'Large Rectangle Building has Broken Roof'},
+  // add the rest … (B2, C2, D2, F3, etc.)
 ];
 
 /* --------- Zone auto-labelling ---------- */
@@ -171,13 +162,73 @@ function parseGrid(s){
   return {col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}`};
 }
 function dist(a,b){ return Math.abs(a.col-b.col)+Math.abs(a.row-b.row); }
+
+/* --------- Image inference + robust fallback chain ---------- */
+const PLACEHOLDER = 'data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="84">'+
+  '<rect width="100%" height="100%" fill="#0f1628"/>'+
+  '<text x="50%" y="50%" font-size="14" fill="#8899bb" font-family="Arial" text-anchor="middle" dominant-baseline="middle">No Image</text>'+
+  '</svg>'
+);
+
+// Take a portal, fill missing image fields based on GRID and preferred folder/filenames.
+function withInferredImages(p){
+  const grid = (p.grid||'').toString().trim();
+  const GRID = grid.toUpperCase();      // preferred
+  const gridlc = GRID.toLowerCase();    // fallback
+
+  function infer(kind){ // 'thumb' | 'full' | 'close'
+    const basePreferred = `portalimages/${GRID}_${kind}.png`;
+    // Fallback candidates (lowercase + jpg versions)
+    const alts = [
+      `portalimages/${gridlc}_${kind}.png`,
+      `portalimages/${GRID}_${kind}.jpg`,
+      `portalimages/${gridlc}_${kind}.jpg`
+    ];
+    return { primary: basePreferred, alts };
+  }
+
+  const t = infer('thumb');
+  const f = infer('full');
+  const c = infer('close');
+
+  return {
+    ...p,
+    img:      p.img      || t.primary,
+    imgFull:  p.imgFull  || f.primary,
+    imgClose: p.imgClose || c.primary,
+    _alts: { thumb: t.alts, full: f.alts, close: c.alts } // keep alts for onerror chain
+  };
+}
+
+// onerror handler that walks through alt list before using the placeholder
+function attachFallback(imgEl, altList){
+  imgEl.setAttribute('data-alts', JSON.stringify(altList||[]));
+  imgEl.onerror = function(){
+    try{
+      const left = JSON.parse(this.getAttribute('data-alts')||'[]');
+      if(left.length){
+        const next = left.shift();
+        this.setAttribute('data-alts', JSON.stringify(left));
+        this.src = next;
+      }else{
+        this.src = PLACEHOLDER;
+      }
+    }catch(e){
+      this.src = PLACEHOLDER;
+    }
+  };
+}
+
+/* --------- Sort/filter ---------- */
 function byNearest(from,zoneFilterKey){
   return PORTALS
     .map(p => {
-      const pg = parseGrid(p.grid);
+      const P  = withInferredImages(p);
+      const pg = parseGrid(P.grid);
       if(!pg) return null;
       const z  = zoneOf(pg.label);
-      return {...p, zone:z, d: dist(from, pg)};
+      return {...P, zone:z, d: dist(from, pg)};
     })
     .filter(Boolean)
     .filter(p => !zoneFilterKey || p.zone.key===zoneFilterKey)
@@ -188,12 +239,7 @@ function byNearest(from,zoneFilterKey){
 function renderRows(rows){
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-  const placeholder = 'data:image/svg+xml;utf8,'+encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="84">'+
-    '<rect width="100%" height="100%" fill="#0f1628"/>'+
-    '<text x="50%" y="50%" font-size="14" fill="#8899bb" font-family="Arial" text-anchor="middle" dominant-baseline="middle">No Image</text>'+
-    '</svg>'
-  );
+
   rows.forEach(r=>{
     const tr = document.createElement('tr');
     tr.innerHTML =
@@ -210,32 +256,41 @@ function renderRows(rows){
     text.textContent = r.notes || '';
     wrap.appendChild(text);
 
-    // Primary image
-    const img1 = document.createElement('img');
-    img1.className = 'noteimg';
-    img1.alt = r.name + ' (overview)';
-    img1.width = 120; img1.height = 84; img1.loading = 'lazy';
-    img1.src = r.img || placeholder;
-    img1.setAttribute('data-full', r.imgFull || r.img || placeholder);
-    img1.onerror = ()=>{ img1.src = placeholder; };
-    wrap.appendChild(img1);
+    const thumbs = document.createElement('div');
+    thumbs.className = 'thumbcol';
 
-    // Secondary image (close-up)
-    if(r.imgClose){
-      const img2 = document.createElement('img');
-      img2.className = 'noteimg';
-      img2.alt = r.name + ' (close-up)';
-      img2.width = 120; img2.height = 84; img2.loading = 'lazy';
-      img2.src = r.imgClose;
-      img2.setAttribute('data-full', r.imgClose);
-      img2.onerror = ()=>{ img2.src = placeholder; };
-      wrap.appendChild(img2);
-    }
+    // ---- Overview thumb ----
+    const o = document.createElement('div'); o.className = 'thumbwrap';
+    const oLabel = document.createElement('span'); oLabel.className = 'thumblabel'; oLabel.textContent = 'Overview';
+    const oImg = document.createElement('img');
+    oImg.className = 'noteimg'; oImg.alt = r.name + ' (overview)';
+    oImg.width=120; oImg.height=84; oImg.loading='lazy';
+    oImg.src = r.img || PLACEHOLDER;
+    oImg.setAttribute('data-full', r.imgFull || r.img || PLACEHOLDER);
+    oImg.title = oImg.src;
+    attachFallback(oImg, (r._alts && r._alts.thumb) || []);
+    o.appendChild(oLabel); o.appendChild(oImg);
+    thumbs.appendChild(o);
 
+    // ---- Close-up thumb ----
+    const c = document.createElement('div'); c.className = 'thumbwrap';
+    const cLabel = document.createElement('span'); cLabel.className = 'thumblabel'; cLabel.textContent = 'Close-up';
+    const cImg = document.createElement('img');
+    cImg.className = 'noteimg'; cImg.alt = r.name + ' (close-up)';
+    cImg.width=120; cImg.height=84; cImg.loading='lazy';
+    cImg.src = r.imgClose || PLACEHOLDER;
+    cImg.setAttribute('data-full', r.imgClose || PLACEHOLDER);
+    cImg.title = cImg.src;
+    attachFallback(cImg, (r._alts && r._alts.close) || []);
+    c.appendChild(cLabel); c.appendChild(cImg);
+    thumbs.appendChild(c);
+
+    wrap.appendChild(thumbs);
     td.appendChild(wrap);
     tr.appendChild(td);
     tbody.appendChild(tr);
   });
+
   if(rows.length===0){
     const tr = document.createElement('tr');
     tr.innerHTML = `<td colspan="5">No portals match those filters.</td>`;
