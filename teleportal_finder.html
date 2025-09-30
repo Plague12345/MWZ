@@ -49,9 +49,18 @@
   /* Lightbox */
   #imgModal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.7);z-index:50}
   #imgModal.open{display:grid}
-  #imgModal img{max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  #imgModal .close{position:absolute;top:12px;right:14px;background:#0f1628;color:#e6eefc;
-    border:1px solid #334267;padding:.45rem .65rem;border-radius:10px;cursor:pointer}
+  /* ⬇️ Force a big display in the lightbox, even if the source is a small thumbnail */
+  #imgModal img{
+    width:min(90vw, 1200px);
+    height:auto;
+    max-height:90vh;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  #imgModal .close{
+    position:absolute;top:12px;right:14px;background:#0f1628;color:#e6eefc;
+    border:1px solid #334267;padding:.45rem .65rem;border-radius:10px;cursor:pointer
+  }
 </style>
 </head>
 <body>
@@ -177,8 +186,10 @@ function renderRows(rows){
   );
   rows.forEach(r=>{
     const thumb = r.img || placeholder;
-    const full  = r.imgFull || thumb;
+    const full  = r.imgFull || r.img || placeholder;
     const tr = document.createElement('tr');
+
+    // Build notes cell with fixed-size thumb
     const wrap = document.createElement('div');
     wrap.className = 'note-wrap';
     const text = document.createElement('div');
@@ -186,13 +197,14 @@ function renderRows(rows){
     const img = document.createElement('img');
     img.className = 'noteimg';
     img.alt = r.name;
-    img.width = 120; img.height = 84;
-    img.loading = 'lazy';
+    img.width = 120; img.height = 84; img.loading = 'lazy';
     img.src = thumb;
     img.setAttribute('data-full', full);
     img.onerror = ()=>{ img.src = placeholder; };
+
     wrap.appendChild(text);
     wrap.appendChild(img);
+
     tr.innerHTML =
       `<td><strong>${r.name}</strong></td>`+
       `<td><span class="pill">${r.grid}</span></td>`+
@@ -234,10 +246,12 @@ renderRows([]);
 const modal = document.getElementById('imgModal');
 const modalPic = document.getElementById('imgModalPic');
 const modalClose = modal.querySelector('.close');
+
 document.addEventListener('click', (e)=>{
   const el = e.target;
   if(el.classList && el.classList.contains('noteimg')){
-    modalPic.src = el.getAttribute('data-full') || el.src;
+    const full = el.getAttribute('data-full') || el.src;
+    modalPic.src = full;
     modalPic.alt = el.alt || '';
     modal.classList.add('open');
     modal.setAttribute('aria-hidden','false');
