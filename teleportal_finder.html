@@ -98,6 +98,7 @@
 <script>
 /* --------------------- Portals (from your map) --------------------- */
 const PORTALS = [
+  {name:'Portal C1', grid:'C1', notes:'2 Story Building, Red Worm Map Room', img:'portalimages/portal_entryC1.png'},
   {name:'Portal B2', grid:'B2', notes:''},
   {name:'Portal C2', grid:'C2', notes:''},
   {name:'Portal D2', grid:'D2', notes:''},
@@ -159,13 +160,16 @@ function renderRows(rows){
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
   rows.forEach(r=>{
+    const imgTag = r.img
+      ? `<img src="${r.img}" alt="${r.name}" style="height:40px;width:auto;border-radius:6px;">`
+      : '';
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td><strong>${r.name}</strong></td>`+
       `<td><span class="pill">${r.grid}</span></td>`+
       `<td><span class="pill ${r.zone.key}">${r.zone.label}</span></td>`+
       `<td>${typeof r.d==='number'? r.d+' grid steps':'—'}</td>`+
-      `<td>${r.notes||''}</td>`;
+      `<td>${r.notes||''} ${imgTag}</td>`;
     tbody.appendChild(tr);
   });
   if(rows.length===0){
