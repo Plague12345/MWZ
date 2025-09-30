@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ • Teleportal Finder</title>
+<link rel="icon" href="Plaguesmwzserver.png" />
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267;
+    --t1:#2a6ae3; --t2:#e39b2a; --t3:#e33a2a;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);
+       color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  header{position:sticky;top:0;z-index:3;background:#0b0f17e6;border-bottom:1px solid #1c2740;backdrop-filter:saturate(1.2) blur(6px)}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand img{height:56px;border-radius:12px}
+  h1{margin:0;font-size:1.45rem;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:.92rem}
+  main{max-width:1100px;margin:20px auto;padding:0 18px}
+  .card{background:#101726;border:1px solid #1b2742;border-radius:16px;padding:16px}
+  .row{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin:10px 0 12px}
+
+  /* Inputs / buttons */
+  select,input,button{background:#0f1628;border:1px solid var(--ring);color:var(--text);
+                      padding:.65rem .75rem;border-radius:12px}
+  input#grid{text-transform:uppercase}
+  input,select{width:100%}
+  button{cursor:pointer;font-weight:600}
+  button:active{transform:translateY(1px)}
+  .btns{align-self:end;display:flex;gap:8px}
+  .btns button{flex:1}
+
+  .results{margin-top:12px}
+
+  /* Table (desktop / tablet) */
+  table{width:100%;border-collapse:separate;border-spacing:0 8px;table-layout:fixed}
+  th,td{text-align:left;padding:10px 12px;vertical-align:middle;word-wrap:break-word}
+  thead th{color:#c9d9fb}
+  tbody tr{background:#101726;border:1px solid #1b2742}
+  tbody td{border-top:1px solid #1b2742;border-bottom:1px solid #1b2742}
+  tbody td:first-child{border-left:1px solid #1b2742;border-top-left-radius:10px;border-bottom-left-radius:10px}
+  tbody td:last-child{border-right:1px solid #1b2742;border-top-right-radius:10px;border-bottom-right-radius:10px}
+  thead th:nth-child(1){width:180px}
+  thead th:nth-child(2){width:80px}
+  thead th:nth-child(3){width:120px}
+  thead th:nth-child(4){width:120px}
+
+  .pill{background:#152038;border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:3px 8px;font-size:.75rem;white-space:nowrap}
+  .pill.t1{background:rgba(42,106,227,.15);border-color:rgba(42,106,227,.5);color:#cfe0ff}
+  .pill.t2{background:rgba(227,155,42,.15);border-color:rgba(227,155,42,.5);color:#ffe3bf}
+  .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
+  .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
+  .note-wrap{display:flex;align-items:center;gap:14px;min-height:84px;flex-wrap:wrap}
+  .thumbcol{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .thumbwrap{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .thumblabel{font-size:.72rem;background:#152038;border:1px solid #213257;color:#bcd3ff;border-radius:999px;padding:2px 6px}
+  .noteimg{width:120px;height:84px;object-fit:cover;border-radius:8px;cursor:pointer}
+  .msg{margin-top:6px;color:#ffb4b4;font-size:.9rem;min-height:1.2em}
+
+  /* Lightbox */
+  #imgModal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.7);z-index:50}
+  #imgModal.open{display:grid}
+  #imgModal img{
+    width:min(90vw, 1200px);
+    height:auto;
+    max-height:90vh;
+    border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  #imgModal .close{
+    position:absolute;top:12px;right:14px;background:#0f1628;color:#e6eefc;
+    border:1px solid #334267;padding:.6rem .75rem;border-radius:12px;cursor:pointer
+  }
+
+  .back-home{text-align:center;margin:30px 0}
+  .back-btn{
+    display:inline-block;padding:12px 18px;background:#101726;border:1px solid var(--ring);border-radius:10px;
+    text-decoration:none;color:var(--text);font-weight:700;transition:transform .08s ease
+  }
+  .back-btn:active{transform:translateY(1px)}
+
+  /* ---------- Mobile tweaks ---------- */
+  @media (max-width: 900px){
+    .row{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width: 680px){
+    .row{grid-template-columns:1fr}
+    .btns{position:sticky;bottom:0;z-index:2;background:linear-gradient(180deg, #0d1424, #0b0f17);
+          padding-top:6px;border-top:1px solid #1b2742}
+    .btns button{width:100%}
+
+    /* Turn table into stacked cards */
+    thead{display:none}
+    table, tbody, tr, td{display:block;width:100%}
+    tbody tr{
+      border:1px solid #1b2742;
+      border-radius:12px;
+      padding:8px 6px;
+      margin:10px 0;
+      background:#0f1628;
+    }
+    tbody td{
+      border:none;
+      padding:8px 10px;
+    }
+    tbody td + td{border-top:1px solid #1b274233}
+    tbody td::before{
+      content: attr(data-label);
+      display:block;
+      font-size:.72rem;
+      color:var(--muted);
+      margin-bottom:4px;
+      letter-spacing:.2px;
+    }
+
+    .note-wrap{flex-direction:column;align-items:flex-start}
+    .thumbcol{width:100%;gap:10px}
+    .thumbwrap{flex:1}
+    .noteimg{width:100%;height:auto;aspect-ratio:16/9}
+  }
+
+  /* Motion-respect */
+  @media (prefers-reduced-motion: reduce){
+    .back-btn, button{transition:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <img src="Plaguesmwzserver.png" alt="Plague's MWZ Server">
+      <div>
+        <h1>MWZ • Teleportal Finder</h1>
+        <div class="sub">Enter your grid (e.g., <strong>F4</strong>). I’ll return the nearest Teleportal entry and auto-color its zone (T1/T2/T3).</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="row">
+      <div>
+        <label for="grid"><small>Where are you?</small></label><br>
+        <input id="grid" placeholder="e.g., F4" maxlength="3"
+               inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false"
+               pattern="[A-Ja-j]\\s*-?\\s*(10|[1-9])" />
+        <div id="msg" class="msg" aria-live="polite"></div>
+      </div>
+      <div>
+        <label for="zone"><small>Zone filter (optional)</small></label><br>
+        <select id="zone">
+          <option value="">Any</option>
+          <option value="t1">White (T1)</option>
+          <option value="t2">Orange (T2)</option>
+          <option value="t3">Red (T3)</option>
+        </select>
+      </div>
+      <div>
+        <label for="limit"><small>Show top</small></label><br>
+        <select id="limit">
+          <option>1</option><option selected>3</option><option>5</option><option>10</option>
+        </select>
+      </div>
+      <div class="btns">
+        <button id="findBtn">Find nearest</button>
+        <button id="listAllBtn" title="Ignore your grid; just list all portals">List all</button>
+      </div>
+    </div>
+
+    <div class="results">
+      <table>
+        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Images</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="hint">Images are loaded from <code>portalimages/GRID_*.png</code> (e.g., <code>portalimages/C1_thumb.png</code> and <code>portalimages/C1_close.png</code>). JPG is also supported.</div>
+    </div>
+  </div>
+
+  <div class="back-home">
+    <a href="index.html" class="back-btn">⬅ Back to Home</a>
+  </div>
+</main>
+
+<!-- Lightbox -->
+<div id="imgModal" aria-hidden="true">
+  <button class="close" aria-label="Close image (Esc)">Close</button>
+  <img id="imgModalPic" alt="">
+</div>
+
+<script>
+/* --------------------- Portals --------------------- */
+/* You can omit img/imgFull/imgClose — paths are inferred from GRID automatically. */
+const PORTALS = [
+  {name:'Portal C1', grid:'C1', notes:'Rectangle Building RedWorm Map Room'},
+  {name:'Portal D1', grid:'D1', notes:'Inside Tunnel - Watch Out for Mercs'},
+  {name:'Portal E1', grid:'E1', notes:'Large Rectangle Building has Broken Roof'},
+  {name:'Portal I2', grid:'I2', notes:'Military Base - Middle Bunker'},
+  {name:'Portal H2', grid:'H2', notes:'Military Base - Broken Building'},
+  {name:'Portal H4', grid:'H4', notes:'Between Lowtown & Farms'},
+  // add the rest … (B2, C2, D2, F3, etc.)
+];
+
+/* --------- Zone auto-labelling ---------- */
+const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);
+const ORANGE_MAP = new Set(['E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7']);
+function zoneOf(cell){
+  if(RED_MAP.has(cell))    return {key:'t3', label:'Red (T3)'};
+  if(ORANGE_MAP.has(cell)) return {key:'t2', label:'Orange (T2)'};
+  return {key:'t1', label:'White (T1)'};
+}
+
+/* ---------------- Helpers ---------------- */
+const letters = 'ABCDEFGHIJ';
+function parseGrid(s){
+  if(!s) return null;
+  s = s.trim().toUpperCase();
+  const m = s.match(/^([A-J])\s*-?\s*(10|[1-9])$/);
+  if(!m) return null;
+  return {col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}`};
+}
+function dist(a,b){ return Math.abs(a.col-b.col)+Math.abs(a.row-b.row); }
+
+/* --------- Image inference + robust fallback chain ---------- */
+const PLACEHOLDER = 'data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="84">'+
+  '<rect width="100%" height="100%" fill="#0f1628"/>'+
+  '<text x="50%" y="50%" font-size="14" fill="#8899bb" font-family="Arial" text-anchor="middle" dominant-baseline="middle">No Image</text>'+
+  '</svg>'
+);
+
+// Take a portal, fill missing image fields based on GRID and preferred folder/filenames.
+function withInferredImages(p){
+  const grid = (p.grid||'').toString().trim();
+  const GRID = grid.toUpperCase();      // preferred
+  const gridlc = GRID.toLowerCase();    // fallback
+
+  function infer(kind){ // 'thumb' | 'full' | 'close'
+    const basePreferred = `portalimages/${GRID}_${kind}.png`;
+    const alts = [
+      `portalimages/${gridlc}_${kind}.png`,
+      `portalimages/${GRID}_${kind}.jpg`,
+      `portalimages/${gridlc}_${kind}.jpg`
+    ];
+    return { primary: basePreferred, alts };
+  }
+
+  const t = infer('thumb');
+  const f = infer('full');
+  const c = infer('close');
+
+  return {
+    ...p,
+    img:      p.img      || t.primary,
+    imgFull:  p.imgFull  || f.primary,
+    imgClose: p.imgClose || c.primary,
+    _alts: { thumb: t.alts, full: f.alts, close: c.alts }
+  };
+}
+
+// onerror handler that walks through alt list before using the placeholder
+function attachFallback(imgEl, altList){
+  imgEl.setAttribute('data-alts', JSON.stringify(altList||[]));
+  imgEl.onerror = function(){
+    try{
+      const left = JSON.parse(this.getAttribute('data-alts')||'[]');
+      if(left.length){
+        const next = left.shift();
+        this.setAttribute('data-alts', JSON.stringify(left));
+        this.src = next;
+      }else{
+        this.src = PLACEHOLDER;
+      }
+    }catch(e){
+      this.src = PLACEHOLDER;
+    }
+  };
+}
+
+/* --------- Sort/filter ---------- */
+function byNearest(from,zoneFilterKey){
+  return PORTALS
+    .map(p => {
+      const P  = withInferredImages(p);
+      const pg = parseGrid(P.grid);
+      if(!pg) return null;
+      const z  = zoneOf(pg.label);
+      return {...P, zone:z, d: dist(from, pg)};
+    })
+    .filter(Boolean)
+    .filter(p => !zoneFilterKey || p.zone.key===zoneFilterKey)
+    .sort((a,b)=>a.d-b.d);
+}
+
+/* ---------------- Render ---------------- */
+const COL_LABELS = ['Portal','Grid','Zone','Distance','Notes / Images'];
+
+function td(label, html){
+  const el = document.createElement('td');
+  el.setAttribute('data-label', label);
+  el.innerHTML = html;
+  return el;
+}
+
+function renderRows(rows){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  rows.forEach(r=>{
+    const tr = document.createElement('tr');
+
+    tr.appendChild(td(COL_LABELS[0], `<strong>${r.name}</strong>`));
+    tr.appendChild(td(COL_LABELS[1], `<span class="pill">${r.grid}</span>`));
+    tr.appendChild(td(COL_LABELS[2], `<span class="pill ${r.zone.key}">${r.zone.label}</span>`));
+    tr.appendChild(td(COL_LABELS[3], `${typeof r.d==='number'? r.d+' grid steps':'—'}`));
+
+    const tdNotes = document.createElement('td');
+    tdNotes.setAttribute('data-label', COL_LABELS[4]);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'note-wrap';
+
+    const text = document.createElement('div');
+    text.textContent = r.notes || '';
+    wrap.appendChild(text);
+
+    const thumbs = document.createElement('div');
+    thumbs.className = 'thumbcol';
+
+    // ---- Overview thumb ----
+    const o = document.createElement('div'); o.className = 'thumbwrap';
+    const oLabel = document.createElement('span'); oLabel.className = 'thumblabel'; oLabel.textContent = 'Overview';
+    const oImg = document.createElement('img');
+    oImg.className = 'noteimg'; oImg.alt = r.name + ' (overview)';
+    oImg.width=120; oImg.height=84; oImg.loading='lazy';
+    oImg.src = r.img || PLACEHOLDER;
+    oImg.setAttribute('data-full', r.imgFull || r.img || PLACEHOLDER);
+    oImg.title = oImg.src;
+    attachFallback(oImg, (r._alts && r._alts.thumb) || []);
+    o.appendChild(oLabel); o.appendChild(oImg);
+    thumbs.appendChild(o);
+
+    // ---- Close-up thumb ----
+    const c = document.createElement('div'); c.className = 'thumbwrap';
+    const cLabel = document.createElement('span'); cLabel.className = 'thumblabel'; cLabel.textContent = 'Close-up';
+    const cImg = document.createElement('img');
+    cImg.className = 'noteimg'; cImg.alt = r.name + ' (close-up)';
+    cImg.width=120; cImg.height=84; cImg.loading='lazy';
+    cImg.src = r.imgClose || PLACEHOLDER;
+    cImg.setAttribute('data-full', r.imgClose || PLACEHOLDER);
+    cImg.title = cImg.src;
+    attachFallback(cImg, (r._alts && r._alts.close) || []);
+    c.appendChild(cLabel); c.appendChild(cImg);
+    thumbs.appendChild(c);
+
+    wrap.appendChild(thumbs);
+    tdNotes.appendChild(wrap);
+    tr.appendChild(tdNotes);
+    tbody.appendChild(tr);
+  });
+
+  if(rows.length===0){
+    const tr = document.createElement('tr');
+    const tdEmpty = document.createElement('td');
+    tdEmpty.setAttribute('data-label', 'Info');
+    tdEmpty.colSpan = 5;
+    tdEmpty.textContent = 'No portals match those filters.';
+    tr.appendChild(tdEmpty);
+    tbody.appendChild(tr);
+  }
+}
+
+/* ---------------- UI wiring ---------------- */
+const input = document.getElementById('grid');
+const zone  = document.getElementById('zone');
+const limit = document.getElementById('limit');
+const msg   = document.getElementById('msg');
+
+function doFind(){
+  const g = parseGrid(input.value);
+  if(!g){ msg.textContent = 'Enter a valid grid like F4 (A–J with 1–10).'; renderRows([]); return; }
+  msg.textContent = '';
+  const rows = byNearest(g, zone.value).slice(0, parseInt(limit.value,10));
+  renderRows(rows);
+}
+
+document.getElementById('findBtn').addEventListener('click', doFind);
+document.getElementById('listAllBtn').addEventListener('click', ()=>{
+  msg.textContent = '';
+  const rows = byNearest({col:0,row:0}, zone.value).map(r=>({...r, d: undefined}));
+  renderRows(rows);
+});
+input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doFind(); });
+window.addEventListener('DOMContentLoaded', ()=>{ input.focus({preventScroll:true}); });
+renderRows([]);
+
+/* ---------------- Lightbox ---------------- */
+const modal = document.getElementById('imgModal');
+const modalPic = document.getElementById('imgModalPic');
+const modalClose = modal.querySelector('.close');
+
+document.addEventListener('click', (e)=>{
+  const el = e.target;
+  if(el.classList && el.classList.contains('noteimg')){
+    const full = el.getAttribute('data-full') || el.src;
+    modalPic.src = full;
+    modalPic.alt = el.alt || '';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+  } else if(el === modal || el === modalClose){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    modalPic.src = '';
+  }
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && modal.classList.contains('open')){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    modalPic.src = '';
+  }
+});
+</script>
+</body>
+</html>
