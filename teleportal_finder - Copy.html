@@ -12,8 +12,8 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);
-       color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);
+       font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
   header{position:sticky;top:0;z-index:3;background:#0b0f17e6;border-bottom:1px solid #1c2740}
   .wrap{max-width:1100px;margin:0 auto;padding:18px}
   .brand{display:flex;align-items:center;gap:14px}
@@ -43,12 +43,13 @@
   .pill.t2{background:rgba(227,155,42,.15);border-color:rgba(227,155,42,.5);color:#ffe3bf}
   .pill.t3{background:rgba(227,58,42,.15); border-color:rgba(227,58,42,.5); color:#ffd0cb}
   .hint{color:#89a1ca;font-size:.9rem;margin-top:10px}
-  .note-wrap{display:flex;align-items:center;gap:8px;min-height:84px;flex-wrap:wrap}
+  .note-wrap{display:flex;align-items:center;gap:8px;min-height:84px}
   .noteimg{width:120px;height:84px;object-fit:cover;border-radius:8px;cursor:pointer}
   .msg{margin-top:6px;color:#ffb4b4;font-size:.9rem;min-height:1.2em}
   /* Lightbox */
   #imgModal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.7);z-index:50}
   #imgModal.open{display:grid}
+  /* ⬇️ Force a big display in the lightbox, even if the source is a small thumbnail */
   #imgModal img{
     width:min(90vw, 1200px);
     height:auto;
@@ -60,12 +61,28 @@
     position:absolute;top:12px;right:14px;background:#0f1628;color:#e6eefc;
     border:1px solid #334267;padding:.45rem .65rem;border-radius:10px;cursor:pointer
   }
-  .back-home{text-align:center;margin:30px 0}
-  .back-btn{
-    display:inline-block;padding:10px 18px;background:#101726;border:1px solid var(--ring);border-radius:8px;
-    text-decoration:none;color:var(--text);font-weight:600;transition:.2s
-  }
-  .back-btn:hover{background:#16233d;border-color:var(--accent);color:var(--accent)}
+  .discord{margin-top:40px;text-align:center}
+.discord-card{
+  display:flex;align-items:center;gap:18px;justify-content:center;
+  background:#101726;border:1px solid #1b2742;border-radius:16px;
+  padding:20px;max-width:700px;margin:0 auto;box-shadow:0 8px 20px rgba(0,0,0,.25)
+}
+.discord-logo{height:72px;width:72px;border-radius:12px}
+.discord-btn{
+  display:inline-block;margin-top:10px;padding:10px 18px;
+  background:#5865F2;color:#fff;text-decoration:none;font-weight:600;
+  border-radius:8px;transition:background .2s
+}
+.discord-btn:hover{background:#4752c4}
+.back-home{text-align:center;margin:30px 0}
+.back-btn{
+  display:inline-block;padding:10px 18px;
+  background:#101726;border:1px solid var(--ring);border-radius:8px;
+  text-decoration:none;color:var(--text);font-weight:600;
+  transition:.2s
+}
+.back-btn:hover{background:#16233d;border-color:var(--accent);color:var(--accent)}
+
 </style>
 </head>
 <body>
@@ -80,6 +97,16 @@
     </div>
   </div>
 </header>
+<section class="discord">
+  <div class="discord-card">
+    <img src="Plaguesmwzserver.png" alt="Plague's MWZ Server" class="discord-logo">
+    <div>
+      <h2>Join the Community</h2>
+      <p>Hop into <strong>Plague's MWZ Server</strong> on Discord to squad up, share tips, and stay updated.</p>
+      <a href="http://join.plaguesmwzserver.com" target="_blank" rel="noopener" class="discord-btn">Join Discord</a>
+    </div>
+  </div>
+</section>
 
 <main>
   <div class="card">
@@ -112,15 +139,11 @@
 
     <div class="results">
       <table>
-        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Images</th></tr></thead>
+        <thead><tr><th>Portal</th><th>Grid</th><th>Zone</th><th>Distance</th><th>Notes / Image</th></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="hint">Each portal can have an overview + close-up image. Click any image to enlarge.</div>
+      <div class="hint">Drop thumbnails into <code>/images/portals/</code>. Without an image, a neutral placeholder will show instead.</div>
     </div>
-  </div>
-
-  <div class="back-home">
-    <a href="index.html" class="back-btn">⬅ Back to Home</a>
   </div>
 </main>
 
@@ -133,23 +156,22 @@
 <script>
 /* --------------------- Portals --------------------- */
 const PORTALS = [
-  {
-    name:'Portal C1',
-    grid:'C1',
-    notes:'Rectangle Building RedWorm Map Room',
-    img:'portalimages/c1_thumb.png',
-    imgFull:'portalimages/c1_full.png',
-    imgClose:'portalimages/c1_close.jpg'
-  },
-  {
-    name:'Portal D1',
-    grid:'D1',
-    notes:'Inside Tunnel - Watch Out for Mercs',
-    img:'portalimages/D1_thumb.png',
-    imgFull:'portalimages/D1_full.png',
-    imgClose:'portalimages/D1_close.jpg'
-  },
-  // ... add rest of portals with imgClose if available
+  {name:'Portal B2', grid:'B2', notes:'Harbor side', img:'images/portals/b2_thumb.png', imgFull:'images/portals/b2_full.png'},
+  {name:'Portal C2', grid:'C2', notes:'', img:'images/portals/c2_thumb.png', imgFull:'images/portals/c2_full.png'},
+  {name:'Portal D1', grid:'D1', notes:'Inside Tunnel, Halfway along', img:'images/portals/d1_thumb.png', imgFull:'images/portals/d1_full.png'},
+  {name:'Portal F3', grid:'F3', notes:'', img:'images/portals/f3_thumb.png', imgFull:'images/portals/f3_full.png'},
+  {name:'Portal G4', grid:'G4', notes:'', img:'images/portals/g4_thumb.png', imgFull:'images/portals/g4_full.png'},
+  {name:'Portal E5', grid:'E5', notes:'', img:'images/portals/e5_thumb.png', imgFull:'images/portals/e5_full.png'},
+  {name:'Portal F6', grid:'F6', notes:'', img:'images/portals/f6_thumb.png', imgFull:'images/portals/f6_full.png'},
+  {name:'Portal G6', grid:'G6', notes:'', img:'images/portals/g6_thumb.png', imgFull:'images/portals/g6_full.png'},
+  {name:'Portal C3', grid:'C3', notes:'', img:'portalimages/c3_thumb.png', imgFull:'portalimages/c3_full.png'},
+  {name:'Portal B4', grid:'B4', notes:'', img:'images/portals/b4_thumb.png', imgFull:'images/portals/b4_full.png'},
+  {name:'Portal C6', grid:'C6', notes:'', img:'images/portals/c6_thumb.png', imgFull:'images/portals/c6_full.png'},
+  {name:'Portal F8', grid:'F8', notes:'', img:'images/portals/f8_thumb.png', imgFull:'images/portals/f8_full.png'},
+  {name:'Portal H8', grid:'H8', notes:'', img:'images/portals/h8_thumb.png', imgFull:'images/portals/h8_full.png'},
+  {name:'Portal I2', grid:'I2', notes:'', img:'images/portals/i2_thumb.png', imgFull:'images/portals/i2_full.png'},
+  {name:'Portal H3', grid:'H3', notes:'', img:'images/portals/h3_thumb.png', imgFull:'images/portals/h3_full.png'},
+  {name:'Portal H5', grid:'H5', notes:'', img:'images/portals/h5_thumb.png', imgFull:'images/portals/h5_full.png'}
 ];
 
 /* --------- Zone auto-labelling ---------- */
@@ -195,43 +217,32 @@ function renderRows(rows){
     '</svg>'
   );
   rows.forEach(r=>{
+    const thumb = r.img || placeholder;
+    const full  = r.imgFull || r.img || placeholder;
     const tr = document.createElement('tr');
+
+    // Build notes cell with fixed-size thumb
+    const wrap = document.createElement('div');
+    wrap.className = 'note-wrap';
+    const text = document.createElement('div');
+    text.textContent = r.notes || '';
+    const img = document.createElement('img');
+    img.className = 'noteimg';
+    img.alt = r.name;
+    img.width = 120; img.height = 84; img.loading = 'lazy';
+    img.src = thumb;
+    img.setAttribute('data-full', full);
+    img.onerror = ()=>{ img.src = placeholder; };
+
+    wrap.appendChild(text);
+    wrap.appendChild(img);
+
     tr.innerHTML =
       `<td><strong>${r.name}</strong></td>`+
       `<td><span class="pill">${r.grid}</span></td>`+
       `<td><span class="pill ${r.zone.key}">${r.zone.label}</span></td>`+
       `<td>${typeof r.d==='number'? r.d+' grid steps':'—'}</td>`;
-
     const td = document.createElement('td');
-    const wrap = document.createElement('div');
-    wrap.className = 'note-wrap';
-
-    const text = document.createElement('div');
-    text.textContent = r.notes || '';
-    wrap.appendChild(text);
-
-    // Primary image
-    const img1 = document.createElement('img');
-    img1.className = 'noteimg';
-    img1.alt = r.name + ' (overview)';
-    img1.width = 120; img1.height = 84; img1.loading = 'lazy';
-    img1.src = r.img || placeholder;
-    img1.setAttribute('data-full', r.imgFull || r.img || placeholder);
-    img1.onerror = ()=>{ img1.src = placeholder; };
-    wrap.appendChild(img1);
-
-    // Secondary image (close-up)
-    if(r.imgClose){
-      const img2 = document.createElement('img');
-      img2.className = 'noteimg';
-      img2.alt = r.name + ' (close-up)';
-      img2.width = 120; img2.height = 84; img2.loading = 'lazy';
-      img2.src = r.imgClose;
-      img2.setAttribute('data-full', r.imgClose);
-      img2.onerror = ()=>{ img2.src = placeholder; };
-      wrap.appendChild(img2);
-    }
-
     td.appendChild(wrap);
     tr.appendChild(td);
     tbody.appendChild(tr);
@@ -290,5 +301,9 @@ document.addEventListener('keydown', (e)=>{
   }
 });
 </script>
+<div class="back-home">
+  <a href="index.html" class="back-btn">⬅ Back to Home</a>
+</div>
+
 </body>
 </html>
