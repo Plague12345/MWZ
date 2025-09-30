@@ -142,18 +142,21 @@ const letters = 'ABCDEFGHIJ';
 function parseGrid(s){
   if(!s) return null;
   s = s.trim().toUpperCase();
-  const m = s.match(/^([A-J])\\s*-?\\s*(10|[1-9])$/);
+  // ✅ correct (single backslashes in the regex literal)
+  const m = s.match(/^([A-J])\s*-?\s*(10|[1-9])$/);
   if(!m) return null;
-  return {col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}`};
+  return { col: letters.indexOf(m[1]), row: parseInt(m[2],10)-1, label:`${m[1]}${m[2]}` };
 }
 function dist(a,b){ return Math.abs(a.col-b.col)+Math.abs(a.row-b.row); }
-function byNearest(from,zoneFilterKey){
+function byNearest(from, zoneFilterKey){
   return PORTALS
     .map(p => {
       const pg = parseGrid(p.grid);
+      if(!pg) return null;                      // guard bad data
       const z  = zoneOf(pg.label);
-      return {...p, zone:z, d: dist(from, pg)};
+      return { ...p, zone: z, d: Math.abs(from.col-pg.col)+Math.abs(from.row-pg.row) };
     })
+    .filter(Boolean)                            // drop nulls
     .filter(p => !zoneFilterKey || p.zone.key===zoneFilterKey)
     .sort((a,b)=>a.d-b.d);
 }
