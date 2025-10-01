@@ -156,8 +156,8 @@ const PORTALS = [
 ];
 
 /* --------- Zone auto-labelling ---------- */
-const RED_MAP = new Set(['F4','F5','F6','G4','G5','G6','E5']);
-const ORANGE_MAP = new Set(['E4','E6','D4','D5','D6','F3','G3','H4','H5','H6','G7','F7','E7']);
+const RED_MAP = new Set(['F4','F5',,'G4','G5','G6','E5']);
+const ORANGE_MAP = new Set(['E4','E6','D4','D5','D6','F3','F6','G3','H4','H5','H6','G7','F7','E7']);
 function zoneOf(cell){
   if(RED_MAP.has(cell))    return {key:'t3', label:'Red (T3)'};
   if(ORANGE_MAP.has(cell)) return {key:'t2', label:'Orange (T2)'};

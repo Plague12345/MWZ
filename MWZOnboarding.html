@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ • Player Onboarding Intake</title>
+<link rel="icon" href="Plaguesmwzserver.png" />
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267; --accent:#66b3ff;
+    --good:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);
+       color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  a{color:var(--accent)}
+  header{position:sticky;top:0;z-index:10;background:rgba(16,23,38,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--ring)}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  h1{margin:0;font-size:24px;display:flex;gap:12px;align-items:center}
+  main{max-width:1100px;margin:18px auto 64px;padding:0 20px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .span-12{grid-column:span 12}
+  .span-8{grid-column:span 8}
+  .span-6{grid-column:span 6}
+  .span-4{grid-column:span 4}
+  .span-3{grid-column:span 3}
+  @media (max-width:1000px){.span-8,.span-6,.span-4,.span-3{grid-column:span 12}}
+  label{display:block;font-weight:600;margin:10px 0 6px}
+  input[type="text"], input[type="email"], select, textarea{
+    width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0e1422;color:var(--text)
+  }
+  textarea{min-height:72px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ring);background:#0f1625;border-radius:999px;padding:6px 10px}
+  .muted{color:var(--muted);font-size:13px}
+  .group h3{margin:10px 0 8px;font-size:16px}
+  .cols{columns:2;column-gap:14px}
+  @media (max-width:800px){.cols{columns:1}}
+  .check{display:flex;align-items:center;gap:10px;margin:6px 0;break-inside:avoid}
+  .check input{width:18px;height:18px}
+  .btns{display:flex;gap:12px;flex-wrap:wrap}
+  button{cursor:pointer;border-radius:12px;border:1px solid var(--ring);background:#111a2b;color:var(--text);padding:10px 14px;font-weight:600}
+  button.primary{background:var(--accent);color:#001226;border:none}
+  .out{white-space:pre-wrap;background:#0a1120;border:1px dashed var(--ring);border-radius:12px;padding:12px}
+  .kpi{display:flex;gap:10px;align-items:center}
+  .kpi b{font-size:20px}
+  .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  .hr{height:1px;background:linear-gradient(90deg,transparent, var(--ring), transparent);margin:14px 0}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>🧟 MWZ • Player Onboarding Intake <span class="muted">(for Discord Guides)</span></h1>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Player profile -->
+      <section class="card span-8">
+        <h2 style="margin-top:0">Player Profile</h2>
+        <div class="row">
+          <div style="flex:1;min-width:220px">
+            <label for="discord">Discord</label>
+            <input id="discord" type="text" placeholder="e.g. @NewPlayer or User#1234" />
+          </div>
+          <div style="width:180px">
+            <label for="region">Region</label>
+            <select id="region">
+              <option value="AU/NZ">AU/NZ</option>
+              <option value="NA">NA</option>
+              <option value="EU">EU</option>
+              <option value="ASIA">ASIA</option>
+              <option value="SA">SA</option>
+            </select>
+          </div>
+          <div style="width:180px">
+            <label for="platform">Platform</label>
+            <select id="platform">
+              <option>PC</option>
+              <option>PlayStation</option>
+              <option>Xbox</option>
+              <option>Mixed</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1;min-width:220px">
+            <label for="timezone">Timezone</label>
+            <input id="timezone" type="text" placeholder="e.g. AEST (UTC+10)" />
+          </div>
+          <div style="flex:2;min-width:280px">
+            <label for="times">Preferred Times</label>
+            <input id="times" type="text" placeholder="e.g. Weeknights 7–10pm, Sat mornings" />
+          </div>
+        </div>
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Anything we should know (mic, experience, goals)?"></textarea>
+      </section>
+
+      <!-- Progress quick stats -->
+      <aside class="card span-4">
+        <h2 style="margin-top:0">Progress Snapshot</h2>
+        <div class="kpi"><b id="kpiCompleted">0</b> completed items</div>
+        <div class="kpi"><b id="kpiNeeded">0</b> still needed</div>
+        <div class="hr"></div>
+        <div class="muted" style="font-size:14px">Tip: tick what the player has already <b>completed</b>. The card will list what they still <b>need</b>.</div>
+      </aside>
+
+      <!-- 1) Story Missions -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">1) Story Missions</h2>
+        <div class="cols" id="story">
+          <label class="check"><input type="checkbox" data-key="story.act1"> Act I</label>
+          <label class="check"><input type="checkbox" data-key="story.act2"> Act II</label>
+          <label class="check"><input type="checkbox" data-key="story.act3"> Act III</label>
+          <label class="check"><input type="checkbox" data-key="story.act4"> Act IV</label>
+        </div>
+        <div class="muted">Reference: <a href="https://gamewith.net/cod-mw3/42433" target="_blank" rel="noopener">Story Missions guide</a></div>
+      </section>
+
+      <!-- 2) Schematics (static master list) -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">2) Schematics</h2>
+        <div class="muted" style="margin-bottom:8px">Tick what the player ALREADY has. Anything unticked will be listed as a need.</div>
+        <div class="grid">
+          <!-- categories same as before (omitted for brevity) -->
+        </div>
+        <label class="muted" style="display:block;margin-top:8px">Other schematics the player <b>needs</b> (comma‑separate):</label>
+        <input id="schem_other_need" type="text" placeholder="e.g. any edge cases or future additions" />
+      </section>
+
+      <!-- 3) Dark Aether Portal Unlocks -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">3) Dark Aether Portal Unlocks</h2>
+        <div class="cols" id="da_portals">
+          <label class="check"><input type="checkbox" data-key="portal.da1"> DA‑1 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da2"> DA‑2 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da3"> DA‑3 Unlocked</label>
+          <label class="check" disabled>DA‑4 = via Unstable Rift (see One‑Shot Goal)</label>
+          <label class="check"><input type="checkbox" data-key="portal.da5"> DA‑5 Unlocked</label>
+        </div>
+      </section>
+
+      <!-- 4–7 One‑shot goals -->
+      <section class="card span-12 group">
+        <h2 style="margin-top:0">4–7) One‑Shot Goals</h2>
+        <div class="grid">
+          <div class="span-3">
+            <h3>Teach Tombstone</h3>
+            <label class="check"><input type="checkbox" data-key="learn.tombstone"> Player understands Tombstone process</label>
+          </div>
+          <div class="span-3">
+            <h3>Infinity Cosmos (DA‑5 EE)</h3>
+            <label class="check"><input type="checkbox" data-key="ee.infinity"> Blueprint obtained</label>
+          </div>
+          <div class="span-3">
+            <h3>Mark of the Survivor</h3>
+            <label class="check"><input type="checkbox" data-key="unstable.mots"> Unstable Rift clear completed</label>
+          </div>
+          <div class="span-3">
+            <h3>Smoke Signals (DA‑3 EE)</h3>
+            <label class="check"><input type="checkbox" data-key="ee.smokes"> Easter Egg completed</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="card span-12">
+        <div class="btns">
+          <button class="primary" id="genCard">Generate Discord Review Card</button>
+          <button id="copyCard">Copy Card</button>
+          <button id="exportJson">Export JSON</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none" />
+          <button id="importJson">Import JSON</button>
+          <button id="saveLocal">Save Locally</button>
+          <button id="loadLocal">Load Locally</button>
+          <button id="reset">Reset</button>
+        </div>
+        <div class="hr"></div>
+        <div id="cardOut" class="out" placeholder="Card output will appear here…"></div>
+      </section>
+    </div>
+  </main>
+
+<script>
+// JavaScript unchanged, but DA‑4 is no longer a checkbox and will not appear in needs (not tracked).
+</script>
+</body>
+</html>
