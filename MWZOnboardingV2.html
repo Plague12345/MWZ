@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ • Player Onboarding Intake</title>
+<link rel="icon" href="Plaguesmwzserver.png" />
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267; --accent:#66b3ff;
+    --good:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);
+       color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  a{color:var(--accent)}
+  header{position:sticky;top:0;z-index:10;background:rgba(16,23,38,.85);backdrop-filter:blur(6px);border-bottom:1px solid var(--ring)}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  h1{margin:0;font-size:24px;display:flex;gap:12px;align-items:center}
+  main{max-width:1100px;margin:18px auto 64px;padding:0 20px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .span-12{grid-column:span 12}
+  .span-8{grid-column:span 8}
+  .span-6{grid-column:span 6}
+  .span-4{grid-column:span 4}
+  .span-3{grid-column:span 3}
+  @media (max-width:1000px){.span-8,.span-6,.span-4,.span-3{grid-column:span 12}}
+  label{display:block;font-weight:600;margin:10px 0 6px}
+  input[type="text"], select, textarea{
+    width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--ring);background:#0e1422;color:var(--text)
+  }
+  input[readonly]{opacity:.9}
+  textarea{min-height:72px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .muted{color:var(--muted);font-size:13px}
+  .group h3{margin:10px 0 8px;font-size:16px}
+  .cols{columns:2;column-gap:14px}
+  @media (max-width:800px){.cols{columns:1}}
+  .check{display:flex;align-items:center;gap:10px;margin:6px 0;break-inside:avoid}
+  .check input{width:18px;height:18px}
+  .btns{display:flex;gap:12px;flex-wrap:wrap}
+  button{cursor:pointer;border-radius:12px;border:1px solid var(--ring);background:#111a2b;color:var(--text);padding:10px 14px;font-weight:600}
+  button.primary{background:var(--accent);color:#001226;border:none}
+  .out{white-space:pre-wrap;background:#0a1120;border:1px dashed var(--ring);border-radius:12px;padding:12px}
+  .kpi{display:flex;gap:10px;align-items:center}
+  .kpi b{font-size:20px}
+  .hr{height:1px;background:linear-gradient(90deg,transparent, var(--ring), transparent);margin:14px 0}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>🧟 MWZ • Player Onboarding Intake <span class="muted">(for Discord Guides)</span></h1>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Player profile -->
+      <section class="card span-8">
+        <h2 style="margin-top:0">Player Profile</h2>
+        <div class="row">
+          <div style="flex:1;min-width:220px">
+            <label for="discord">Discord</label>
+            <input id="discord" type="text" placeholder="e.g. @NewPlayer or User#1234" />
+          </div>
+          <div style="width:180px">
+            <label for="region">Region</label>
+            <select id="region">
+              <option value="AU/NZ">AU/NZ</option>
+              <option value="NA">NA</option>
+              <option value="EU">EU</option>
+              <option value="ASIA">ASIA</option>
+              <option value="SA">SA</option>
+            </select>
+          </div>
+          <div style="width:180px">
+            <label for="platform">Platform</label>
+            <select id="platform">
+              <option>PC</option>
+              <option>PlayStation</option>
+              <option>Xbox</option>
+              <option>Mixed</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1;min-width:220px">
+            <label for="timezone">Timezone</label>
+            <input id="timezone" type="text" placeholder="e.g. AEST (UTC+10)" />
+          </div>
+          <div style="flex:2;min-width:280px">
+            <label for="times">Preferred Times</label>
+            <input id="times" type="text" placeholder="e.g. Weeknights 7–10pm, Sat mornings" />
+          </div>
+        </div>
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Anything we should know (mic, experience, goals)?"></textarea>
+      </section>
+
+      <!-- Progress quick stats -->
+      <aside class="card span-4">
+        <h2 style="margin-top:0">Progress Snapshot</h2>
+        <div class="kpi"><b id="kpiCompleted">0</b> completed items</div>
+        <div class="kpi"><b id="kpiNeeded">0</b> still needed</div>
+        <div class="hr"></div>
+        <div class="muted" style="font-size:14px">Tick what the player has already <b>completed</b>. The card lists what they still <b>need</b>.</div>
+      </aside>
+
+      <!-- 1) Story Missions -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">1) Story Missions</h2>
+        <div class="cols" id="story">
+          <label class="check"><input type="checkbox" data-key="story.act1"> Act I</label>
+          <label class="check"><input type="checkbox" data-key="story.act2"> Act II</label>
+          <label class="check"><input type="checkbox" data-key="story.act3"> Act III</label>
+          <label class="check"><input type="checkbox" data-key="story.act4"> Act IV</label>
+        </div>
+        <div class="muted">Reference: <a href="https://gamewith.net/cod-mw3/42433" target="_blank" rel="noopener">Story Missions guide</a></div>
+      </section>
+
+      <!-- 2) Schematics (static master list) -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">2) Schematics</h2>
+        <div class="muted" style="margin-bottom:8px">Tick what the player ALREADY has. Anything unticked will be listed as a need.</div>
+        <div class="grid">
+          <!-- Aether Tools -->
+          <div class="span-6">
+            <h3>Aether Tools</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Uncommon Aether Tool"> Uncommon Aether Tool</label>
+              <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Rare Aether Tool"> Rare Aether Tool</label>
+              <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Epic Aether Tool"> Epic Aether Tool</label>
+              <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Legendary Aether Tool"> Legendary Aether Tool</label>
+            </div>
+          </div>
+          <!-- Aetherium Crystals -->
+          <div class="span-6">
+            <h3>Aetherium Crystals</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Raw Aetherium Crystal"> Raw Aetherium Crystal</label>
+              <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Refined Aetherium Crystal"> Refined Aetherium Crystal</label>
+              <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Flawless Aetherium Crystal"> Flawless Aetherium Crystal</label>
+            </div>
+          </div>
+          <!-- Perk Colas -->
+          <div class="span-6">
+            <h3>Perk Colas</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Deadshot Daiquiri"> Deadshot Daiquiri</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Death Perception"> Death Perception</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Elemental Pop"> Elemental Pop</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Jugger-Nog"> Jugger-Nog</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.PHD Flopper"> PHD Flopper</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Quick Revive"> Quick Revive</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Speed Cola"> Speed Cola</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Stamin-Up"> Stamin-Up</label>
+              <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Tombstone Soda"> Tombstone Soda</label>
+            </div>
+          </div>
+          <!-- Ammo Mods -->
+          <div class="span-6">
+            <h3>Ammo Mods</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Brain Rot"> Brain Rot</label>
+              <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Cryo Freeze"> Cryo Freeze</label>
+              <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Dead Wire"> Dead Wire</label>
+              <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Napalm Burst"> Napalm Burst</label>
+              <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Shatter Blast"> Shatter Blast</label>
+            </div>
+          </div>
+          <!-- Wonder Weapons -->
+          <div class="span-6">
+            <h3>Wonder Weapons</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.Ray Gun Case"> Ray Gun Case</label>
+              <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.The Scorcher Case"> The Scorcher Case</label>
+              <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.V-R11 Case"> V-R11 Case</label>
+              <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.Wunderwaffe DG-2 Case"> Wunderwaffe DG-2 Case</label>
+            </div>
+          </div>
+          <!-- Classified Items -->
+          <div class="span-6">
+            <h3>Classified Items</h3>
+            <div class="cols">
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Aether Blade Case"> Aether Blade Case</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Dog Bone"> Dog Bone</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Golden Armor Plate"> Golden Armor Plate</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Blood Burner Keys"> Blood Burner Keys</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Mag of Holding"> Mag of Holding</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Golden Mask Filter"> Golden Mask Filter</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Dead Wire Detonators"> Dead Wire Detonators</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Sergeant's Beret"> Sergeant's Beret</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Disciple Bottle"> Disciple Bottle</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.Grenade Bandolier"> Grenade Bandolier</label>
+              <label class="check"><input type="checkbox" data-key="schem.Classified Items.30 Stash Increase"> 30 Stash Increase</label>
+            </div>
+          </div>
+        </div>
+        <label class="muted" style="display:block;margin-top:8px">Other schematics the player <b>needs</b> (comma‑separate):</label>
+        <input id="schem_other_need" type="text" placeholder="e.g. any edge cases or future additions" />
+      </section>
+
+      <!-- 3) Dark Aether Portal Unlocks -->
+      <section class="card span-6 group">
+        <h2 style="margin-top:0">3) Dark Aether Portal Unlocks</h2>
+        <div class="cols" id="da_portals">
+          <label class="check"><input type="checkbox" data-key="portal.da1"> DA‑1 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da2"> DA‑2 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da3"> DA‑3 Unlocked</label>
+          <label class="check" title="DA‑4 comes from completing Unstable Rift (see One‑Shot Goal)">DA‑4 = via Unstable Rift (see One‑Shot Goal)</label>
+          <label class="check"><input type="checkbox" data-key="portal.da5"> DA‑5 Unlocked</label>
+        </div>
+      </section>
+
+      <!-- 4–7 One‑shot goals -->
+      <section class="card span-12 group">
+        <h2 style="margin-top:0">4–7) One‑Shot Goals</h2>
+        <div class="grid">
+          <div class="span-3">
+            <h3>Teach Tombstone</h3>
+            <label class="check"><input type="checkbox" data-key="learn.tombstone"> Player understands Tombstone process</label>
+          </div>
+          <div class="span-3">
+            <h3>Infinity Cosmos (DA‑5 EE)</h3>
+            <label class="check"><input type="checkbox" data-key="ee.infinity"> Blueprint obtained</label>
+          </div>
+          <div class="span-3">
+            <h3>Mark of the Survivor</h3>
+            <label class="check"><input type="checkbox" data-key="unstable.mots"> Unstable Rift clear completed</label>
+          </div>
+          <div class="span-3">
+            <h3>Smoke Signals (DA‑3 EE)</h3>
+            <label class="check"><input type="checkbox" data-key="ee.smokes"> Easter Egg completed</label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="card span-12">
+        <div class="btns">
+          <button class="primary" id="genCard">Generate Discord Review Card</button>
+          <button id="copyCard">Copy Card</button>
+          <button id="exportJson">Export JSON</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none" />
+          <button id="importJson">Import JSON</button>
+          <button id="saveLocal">Save Locally</button>
+          <button id="loadLocal">Load Locally</button>
+          <button id="getShare">Get Share Link</button>
+          <button id="reset">Reset</button>
+        </div>
+        <div class="row" style="margin-top:10px;align-items:center;gap:8px">
+          <input id="shareUrl" type="text" readonly placeholder="Share link will appear here…" />
+        </div>
+        <div class="hr"></div>
+        <div id="cardOut" class="out" placeholder="Card output will appear here…"></div>
+      </section>
+    </div>
+  </main>
+
+<script>
+(function(){
+  const $ = (sel, ctx=document) => ctx.querySelector(sel);
+  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+  const state = {};
+  const allChecks = $$('input[type="checkbox"][data-key]');
+  allChecks.forEach(cb => {
+    const key = cb.dataset.key;
+    state[key] = false;
+    cb.addEventListener('change', () => {
+      state[key] = cb.checked;
+      updateKPIs();
+    });
+  });
+
+  function b64EncodeUnicode(str){
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_,p)=>String.fromCharCode('0x'+p)));
+  }
+  function b64DecodeUnicode(str){
+    return decodeURIComponent(Array.from(atob(str), c=>'%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  }
+
+  function getProfile(){
+    return {
+      discord: $('#discord').value.trim(),
+      region: $('#region').value,
+      platform: $('#platform').value,
+      timezone: $('#timezone').value.trim(),
+      times: $('#times').value.trim(),
+      notes: $('#notes').value.trim(),
+      schem_other_need: $('#schem_other_need').value.trim()
+    };
+  }
+
+  function setProfile(p){
+    $('#discord').value = p.discord||'';
+    $('#region').value = p.region||'AU/NZ';
+    $('#platform').value = p.platform||'PC';
+    $('#timezone').value = p.timezone||'';
+    $('#times').value = p.times||'';
+    $('#notes').value = p.notes||'';
+    $('#schem_other_need').value = p.schem_other_need||'';
+  }
+
+  function getChecksObject(){
+    return Object.fromEntries(allChecks.map(cb=>[cb.dataset.key, cb.checked]));
+  }
+  function setChecksObject(obj){
+    allChecks.forEach(cb=>{
+      cb.checked = !!obj[cb.dataset.key];
+      state[cb.dataset.key] = cb.checked;
+    });
+  }
+
+  function updateKPIs(){
+    const total = allChecks.length;
+    const completed = allChecks.filter(c=>c.checked).length;
+    $('#kpiCompleted').textContent = completed;
+    $('#kpiNeeded').textContent = total - completed;
+  }
+
+  function buildNeedsList(){
+    const needs = [];
+    const groups = { story: [], portal: [], learn: [], ee: [], unstable: [], schem: {} };
+
+    allChecks.forEach(cb => {
+      if(cb.checked) return;
+      const key = cb.dataset.key; // e.g. schem.Aether Tools.Uncommon Aether Tool
+      const parts = key.split('.');
+      const g = parts[0];
+      if(g === 'schem'){
+        const cat = parts[1] || 'Other';
+        if(!groups.schem[cat]) groups.schem[cat] = [];
+        groups.schem[cat].push(labelText(cb));
+      } else {
+        if(groups[g]) groups[g].push(labelText(cb));
+      }
+    });
+
+    const pushIfAny = (title, arr) => { if(arr && arr.length) needs.push({title, items: arr}); };
+
+    pushIfAny('Story Missions', groups.story);
+
+    Object.keys(groups.schem).sort().forEach(cat => {
+      pushIfAny(`Schematics — ${cat}`, groups.schem[cat]);
+    });
+
+    pushIfAny('DA Portal Unlocks', groups.portal);
+    pushIfAny('Teach Tombstone', groups.learn);
+    pushIfAny('Infinity Cosmos (DA‑5 EE)', groups.ee);
+    pushIfAny('Mark of the Survivor', groups.unstable);
+
+    const schemOther = $('#schem_other_need').value.trim();
+    if(schemOther) needs.push({title:'Schematics — Other Needs', items:[schemOther]});
+
+    return needs;
+  }
+
+  function labelText(cb){
+    const parent = cb.closest('label');
+    return parent ? parent.textContent.trim().replace(/^\s*\[?\]?\s*/,'') : cb.dataset.key;
+  }
+
+  function makeDiscordCard(){
+    const p = getProfile();
+    const needs = buildNeedsList();
+
+    const header = `**🧟 New Player Review — ${p.discord||'Unknown'}**\n`+
+      `Region: ${p.region} | Platform: ${p.platform} | TZ: ${p.timezone||'n/a'}\n`+
+      `${p.times?`Availability: ${p.times}\n`:''}`+
+      `${p.notes?`Notes: ${p.notes}\n`:''}`+
+      `\n__What they still need:__\n`+
+      `_Note: DA‑4 unlock is tied to Unstable Rift (see One‑Shot Goal)._`;
+
+    const bullets = needs.length ? needs.map(g => {
+      const items = g.items.map(i=>`• ${i}`).join('\n');
+      return `\n**${g.title}**\n${items}`;
+    }).join('\n') : '\n_Looks all done!_ ✅';
+
+    return header + bullets;
+  }
+
+  function exportJSON(){
+    const data = { profile: getProfile(), checks: getChecksObject() };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const name = (data.profile.discord||'player').replace(/[^a-z0-9_\-]+/gi,'_');
+    a.href = url; a.download = `${name}_mwz_onboarding.json`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSONFile(file){
+    const reader = new FileReader();
+    reader.onload = e => {
+      try{
+        const data = JSON.parse(e.target.result);
+        if(data.profile) setProfile(data.profile);
+        if(data.checks) setChecksObject(data.checks);
+        updateKPIs();
+        $('#cardOut').textContent = makeDiscordCard();
+      }catch(err){ alert('Invalid JSON file.'); }
+    };
+    reader.readAsText(file);
+  }
+
+  function saveLocal(){
+    const tag = $('#discord').value.trim()||'unknown';
+    const data = { profile: getProfile(), checks: getChecksObject() };
+    localStorage.setItem(`mwz:onboard:${tag}`, JSON.stringify(data));
+    alert('Saved locally.');
+  }
+
+  function loadLocal(){
+    const tag = $('#discord').value.trim()||'unknown';
+    const raw = localStorage.getItem(`mwz:onboard:${tag}`);
+    if(!raw){ alert('No local save for this Discord tag.'); return; }
+    try{
+      const data = JSON.parse(raw);
+      if(data.profile) setProfile(data.profile);
+      if(data.checks) setChecksObject(data.checks);
+      updateKPIs();
+      $('#cardOut').textContent = makeDiscordCard();
+    }catch(e){ alert('Stored data is invalid.'); }
+  }
+
+  function getShareLink(){
+    const data = { profile: getProfile(), checks: getChecksObject() };
+    const packed = b64EncodeUnicode(JSON.stringify(data));
+    const base = location.origin + location.pathname;
+    return `${base}#s=${packed}`;
+  }
+
+  function loadFromHash(){
+    if(!location.hash.startsWith('#s=')) return false;
+    try{
+      const packed = location.hash.slice(3);
+      const data = JSON.parse(b64DecodeUnicode(packed));
+      if(data.profile) setProfile(data.profile);
+      if(data.checks) setChecksObject(data.checks);
+      updateKPIs();
+      $('#cardOut').textContent = makeDiscordCard();
+      return true;
+    }catch(e){ console.warn('Bad share hash'); return false; }
+  }
+
+  // Buttons
+  $('#genCard').addEventListener('click', ()=>{
+    $('#cardOut').textContent = makeDiscordCard();
+  });
+  $('#copyCard').addEventListener('click', async ()=>{
+    const txt = $('#cardOut').textContent||'';
+    if(!txt){ alert('Generate the card first.'); return; }
+    try{ await navigator.clipboard.writeText(txt); alert('Copied to clipboard.'); }
+    catch{ alert('Copy failed. Select the text and copy manually.'); }
+  });
+  $('#exportJson').addEventListener('click', exportJSON);
+  $('#importJson').addEventListener('click', ()=> $('#importFile').click());
+  $('#importFile').addEventListener('change', e=>{
+    const f = e.target.files?.[0]; if(f) importJSONFile(f);
+  });
+  $('#saveLocal').addEventListener('click', saveLocal);
+  $('#loadLocal').addEventListener('click', loadLocal);
+  $('#getShare').addEventListener('click', async ()=>{
+    const url = getShareLink();
+    $('#shareUrl').value = url;
+    try{ await navigator.clipboard.writeText(url); alert('Share link copied to clipboard.'); }
+    catch{ /* ignore */ }
+  });
+  $('#reset').addEventListener('click', ()=>{
+    $$('input[type="checkbox"][data-key]').forEach(cb=>cb.checked=false);
+    setProfile({});
+    updateKPIs();
+    $('#cardOut').textContent = '';
+    $('#shareUrl').value = '';
+    history.replaceState(null, '', location.pathname);
+  });
+
+  // Init
+  updateKPIs();
+  loadFromHash();
+})();
+</script>
+</body>
+</html>
