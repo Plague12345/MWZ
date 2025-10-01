@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MWZ • Onboarding (Mobile‑Lite)</title>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#101726; --muted:#9fb1d0; --text:#e6eefc; --ring:#334267; --accent:#66b3ff; --accent-2:#8ad0ff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0b0f17 0%, #0e1422 100%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+  header{position:sticky;top:0;z-index:50;background:rgba(16,23,38,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--ring)}
+  h1{margin:0;font-size:18px;padding:14px 14px;display:flex;gap:10px;align-items:center}
+  main{max-width:720px;margin:0 auto;padding:14px}
+  .card{background:var(--panel);border:1px solid var(--ring);border-radius:16px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  label{display:block;font-weight:600;margin:10px 0 6px}
+  input[type="text"], textarea, select{width:100%;padding:14px;border-radius:12px;border:1px solid var(--ring);background:#0e1422;color:var(--text);font-size:16px}
+  input[readonly]{opacity:.9}
+  textarea{min-height:84px}
+  .btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:14px 16px;border:1px solid var(--ring);border-radius:14px;background:#111a2b;color:var(--text);font-weight:700;font-size:16px}
+  .btn.primary{background:var(--accent);color:#001226;border:none}
+  .btn.block{width:100%}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .muted{color:var(--muted);font-size:13px}
+  .kpi{display:flex;gap:10px;align-items:center;font-weight:700}
+  .progress{height:10px;background:#0a1120;border:1px solid var(--ring);border-radius:999px;overflow:hidden}
+  .progress > div{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+  .step{display:none}
+  .step.active{display:block}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .cols2{columns:2;column-gap:12px}
+  .check{display:flex;align-items:center;gap:12px;margin:10px 0;break-inside:avoid}
+  .check input{width:22px;height:22px}
+  details{border:1px solid var(--ring);border-radius:12px;padding:8px 10px;background:#0e1422;margin:8px 0}
+  summary{cursor:pointer;font-weight:800}
+  .out{white-space:pre-wrap;background:#0a1120;border:1px dashed var(--ring);border-radius:12px;padding:12px;margin-top:10px}
+  .topbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:8px 0 12px}
+  .pill{font-size:12px;border:1px solid var(--ring);padding:6px 10px;border-radius:999px;color:var(--muted)}
+</style>
+</head>
+<body>
+  <header>
+    <h1>🧟 MWZ • Onboarding (Mobile‑Lite)</h1>
+  </header>
+  <main>
+    <div class="card">
+      <div class="topbar">
+        <div class="kpi"><span id="kpiCompleted">0</span>/<span id="kpiTotal">0</span> completed</div>
+        <div class="pill" id="stepLabel">Step 1 of 6</div>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="prog"></div></div>
+
+      <!-- Step 1: Profile -->
+      <section class="step active" data-step="1" id="step1">
+        <h2 style="margin:10px 0">Profile</h2>
+        <label>Discord</label>
+        <input id="discord" type="text" placeholder="@NewPlayer or User#1234" />
+        <div class="row">
+          <div style="flex:1;min-width:160px">
+            <label>Region</label>
+            <select id="region">
+              <option value="AU/NZ">AU/NZ</option>
+              <option value="NA">NA</option>
+              <option value="EU">EU</option>
+              <option value="ASIA">ASIA</option>
+              <option value="SA">SA</option>
+            </select>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <label>Platform</label>
+            <select id="platform">
+              <option>PC</option>
+              <option>PlayStation</option>
+              <option>Xbox</option>
+              <option>Mixed</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div style="flex:1;min-width:160px">
+            <label>Timezone</label>
+            <input id="timezone" type="text" placeholder="AEST (UTC+10)" />
+          </div>
+          <div style="flex:1;min-width:160px">
+            <label>Preferred Times</label>
+            <input id="times" type="text" placeholder="Weeknights, Sat mornings" />
+          </div>
+        </div>
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Mic, experience, goals…"></textarea>
+      </section>
+
+      <!-- Step 2: Story -->
+      <section class="step" data-step="2" id="step2">
+        <h2 style="margin:10px 0">Story Missions</h2>
+        <div class="cols2">
+          <label class="check"><input type="checkbox" data-key="story.act1"> Act I</label>
+          <label class="check"><input type="checkbox" data-key="story.act2"> Act II</label>
+          <label class="check"><input type="checkbox" data-key="story.act3"> Act III</label>
+          <label class="check"><input type="checkbox" data-key="story.act4"> Act IV</label>
+        </div>
+        <div class="muted">Ref: gamewith guide</div>
+      </section>
+
+      <!-- Step 3: Schematics (accordion by category) -->
+      <section class="step" data-step="3" id="step3">
+        <h2 style="margin:10px 0">Schematics</h2>
+        <p class="muted">Tick what the player already has. Unticked will be shown as needs.</p>
+        <details open>
+          <summary>Aether Tools</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Uncommon Aether Tool"> Uncommon Aether Tool</label>
+          <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Rare Aether Tool"> Rare Aether Tool</label>
+          <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Epic Aether Tool"> Epic Aether Tool</label>
+          <label class="check"><input type="checkbox" data-key="schem.Aether Tools.Legendary Aether Tool"> Legendary Aether Tool</label>
+        </details>
+        <details>
+          <summary>Aetherium Crystals</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Raw Aetherium Crystal"> Raw Aetherium Crystal</label>
+          <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Refined Aetherium Crystal"> Refined Aetherium Crystal</label>
+          <label class="check"><input type="checkbox" data-key="schem.Aetherium Crystals.Flawless Aetherium Crystal"> Flawless Aetherium Crystal</label>
+        </details>
+        <details>
+          <summary>Perk Colas</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Deadshot Daiquiri"> Deadshot Daiquiri</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Death Perception"> Death Perception</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Elemental Pop"> Elemental Pop</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Jugger-Nog"> Jugger-Nog</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.PHD Flopper"> PHD Flopper</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Quick Revive"> Quick Revive</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Speed Cola"> Speed Cola</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Stamin-Up"> Stamin-Up</label>
+          <label class="check"><input type="checkbox" data-key="schem.Perk Colas.Tombstone Soda"> Tombstone Soda</label>
+        </details>
+        <details>
+          <summary>Ammo Mods</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Brain Rot"> Brain Rot</label>
+          <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Cryo Freeze"> Cryo Freeze</label>
+          <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Dead Wire"> Dead Wire</label>
+          <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Napalm Burst"> Napalm Burst</label>
+          <label class="check"><input type="checkbox" data-key="schem.Ammo Mods.Shatter Blast"> Shatter Blast</label>
+        </details>
+        <details>
+          <summary>Wonder Weapons</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.Ray Gun Case"> Ray Gun Case</label>
+          <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.The Scorcher Case"> The Scorcher Case</label>
+          <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.V-R11 Case"> V-R11 Case</label>
+          <label class="check"><input type="checkbox" data-key="schem.Wonder Weapons.Wunderwaffe DG-2 Case"> Wunderwaffe DG-2 Case</label>
+        </details>
+        <details>
+          <summary>Classified Items</summary>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Aether Blade Case"> Aether Blade Case</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Dog Bone"> Dog Bone</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Golden Armor Plate"> Golden Armor Plate</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Blood Burner Keys"> Blood Burner Keys</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Mag of Holding"> Mag of Holding</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Golden Mask Filter"> Golden Mask Filter</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Dead Wire Detonators"> Dead Wire Detonators</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Sergeant's Beret"> Sergeant's Beret</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Disciple Bottle"> Disciple Bottle</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.Grenade Bandolier"> Grenade Bandolier</label>
+          <label class="check"><input type="checkbox" data-key="schem.Classified Items.30 Stash Increase"> 30 Stash Increase</label>
+        </details>
+        <label class="muted" style="display:block;margin-top:8px">Other schematic needs (comma‑separate):</label>
+        <input id="schem_other_need" type="text" placeholder="Edge cases / extras" />
+      </section>
+
+      <!-- Step 4: Portals -->
+      <section class="step" data-step="4" id="step4">
+        <h2 style="margin:10px 0">DA Portal Unlocks</h2>
+        <div class="cols2">
+          <label class="check"><input type="checkbox" data-key="portal.da1"> DA‑1 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da2"> DA‑2 Unlocked</label>
+          <label class="check"><input type="checkbox" data-key="portal.da3"> DA‑3 Unlocked</label>
+          <label class="check" title="DA‑4 comes from completing Unstable Rift (see Goals)">DA‑4 = via Unstable Rift</label>
+          <label class="check"><input type="checkbox" data-key="portal.da5"> DA‑5 Unlocked</label>
+        </div>
+      </section>
+
+      <!-- Step 5: One-shot Goals -->
+      <section class="step" data-step="5" id="step5">
+        <h2 style="margin:10px 0">One‑Shot Goals</h2>
+        <div class="cols2">
+          <label class="check"><input type="checkbox" data-key="learn.tombstone"> Teach Tombstone — player understands</label>
+          <label class="check"><input type="checkbox" data-key="ee.infinity"> Infinity Cosmos (DA‑5 EE) — blueprint</label>
+          <label class="check"><input type="checkbox" data-key="unstable.mots"> Mark of the Survivor — Unstable Rift clear</label>
+          <label class="check"><input type="checkbox" data-key="ee.smokes"> Smoke Signals (DA‑3 EE) — complete</label>
+        </div>
+      </section>
+
+      <!-- Step 6: Review & Share -->
+      <section class="step" data-step="6" id="step6">
+        <h2 style="margin:10px 0">Review & Share</h2>
+        <p class="muted">Generate a Discord card, export JSON, or share a prefilled link.</p>
+        <div class="btns">
+          <button class="btn primary" id="genCard">Generate Card</button>
+          <button class="btn" id="copyCard">Copy Card</button>
+          <button class="btn" id="exportJson">Export JSON</button>
+          <button class="btn" id="importJson">Import JSON</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json" style="display:none" />
+        <div class="btns" style="margin-top:10px">
+          <button class="btn" id="saveLocal">Save Local</button>
+          <button class="btn" id="loadLocal">Load Local</button>
+          <button class="btn" id="getShare">Get Share Link</button>
+          <button class="btn" id="reset">Reset</button>
+        </div>
+        <input id="shareUrl" type="text" readonly placeholder="Share link will appear here…" style="margin-top:10px" />
+        <div id="cardOut" class="out" style="margin-top:10px"></div>
+      </section>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="prevBtn" style="flex:1">◀ Prev</button>
+        <button class="btn primary" id="nextBtn" style="flex:1">Next ▶</button>
+      </div>
+    </div>
+  </main>
+
+<script>
+(function(){
+  const $ = (s,c=document)=>c.querySelector(s); const $$=(s,c=document)=>Array.from(c.querySelectorAll(s));
+  const steps = $$('.step'); let cur = 0;
+  const prog = $('#prog'); const stepLabel = $('#stepLabel');
+
+  const allChecks = $$('input[type="checkbox"][data-key]');
+  $('#kpiTotal').textContent = allChecks.length;
+
+  function updateKPIs(){
+    const done = allChecks.filter(c=>c.checked).length;
+    $('#kpiCompleted').textContent = done;
+  }
+  allChecks.forEach(cb=>cb.addEventListener('change',updateKPIs));
+
+  function goto(i){
+    cur = Math.max(0, Math.min(i, steps.length-1));
+    steps.forEach((s,idx)=>s.classList.toggle('active', idx===cur));
+    const pct = ((cur)/(steps.length-1))*100; prog.style.width = pct+'%';
+    stepLabel.textContent = `Step ${cur+1} of ${steps.length}`;
+    $('#prevBtn').disabled = cur===0; $('#nextBtn').textContent = cur===steps.length-1? 'Finish ✅':'Next ▶';
+  }
+  $('#prevBtn').addEventListener('click',()=>goto(cur-1));
+  $('#nextBtn').addEventListener('click',()=>{ if(cur<steps.length-1) goto(cur+1); else window.scrollTo({top:0,behavior:'smooth'}); });
+
+  // data helpers
+  function getProfile(){
+    return {discord:$('#discord').value.trim(), region:$('#region').value, platform:$('#platform').value, timezone:$('#timezone').value.trim(), times:$('#times').value.trim(), notes:$('#notes').value.trim(), schem_other_need:$('#schem_other_need')?.value.trim()||''};
+  }
+  function setProfile(p){ $('#discord').value=p.discord||''; $('#region').value=p.region||'AU/NZ'; $('#platform').value=p.platform||'PC'; $('#timezone').value=p.timezone||''; $('#times').value=p.times||''; $('#notes').value=p.notes||''; if($('#schem_other_need')) $('#schem_other_need').value=p.schem_other_need||''; }
+  function getChecks(){ return Object.fromEntries(allChecks.map(cb=>[cb.dataset.key, cb.checked])); }
+  function setChecks(obj){ allChecks.forEach(cb=> cb.checked = !!obj[cb.dataset.key]); updateKPIs(); }
+
+  // needs builder
+  function labelText(cb){ const parent = cb.closest('label'); return parent? parent.textContent.trim(): cb.dataset.key; }
+  function buildNeeds(){
+    const needs=[]; const groups={story:[], portal:[], learn:[], ee:[], unstable:[], schem:{}};
+    allChecks.forEach(cb=>{ if(cb.checked) return; const [g,cat] = cb.dataset.key.split('.',3); if(g==='schem'){ const c = cb.dataset.key.split('.')[1]||'Other'; (groups.schem[c] ||= []).push(labelText(cb)); } else { (groups[g] ||= []).push(labelText(cb)); } });
+    const push=(t,a)=>{ if(a && a.length) needs.push({title:t, items:a}); };
+    push('Story Missions', groups.story);
+    Object.keys(groups.schem).sort().forEach(cat=> push(`Schematics — ${cat}`, groups.schem[cat]));
+    push('DA Portal Unlocks', groups.portal);
+    push('Teach Tombstone', groups.learn);
+    push('Infinity Cosmos (DA‑5 EE)', groups.ee);
+    push('Mark of the Survivor', groups.unstable);
+    const extra = $('#schem_other_need')?.value.trim(); if(extra) push('Schematics — Other Needs', [extra]);
+    return needs;
+  }
+
+  // share helpers
+  function enc(s){ return btoa(encodeURIComponent(s).replace(/%([0-9A-F]{2})/g, (_,p)=>String.fromCharCode('0x'+p))); }
+  function dec(s){ return decodeURIComponent(Array.from(atob(s), c=>'%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')); }
+
+  function makeCard(){
+    const p=getProfile(), needs=buildNeeds();
+    const header = `**🧟 New Player Review — ${p.discord||'Unknown'}**\n`+
+      `Region: ${p.region} | Platform: ${p.platform} | TZ: ${p.timezone||'n/a'}\n`+
+      `${p.times?`Availability: ${p.times}\n`:''}`+
+      `${p.notes?`Notes: ${p.notes}\n`:''}`+
+      `\n__What they still need:__\n_Note: DA‑4 unlock is tied to Unstable Rift (see One‑Shot Goal)._`;
+    const bullets = needs.length ? needs.map(g=>`\n**${g.title}**\n${g.items.map(i=>'• '+i).join('\n')}`).join('\n') : '\n_Looks all done!_ ✅';
+    return header + bullets;
+  }
+
+  // actions
+  $('#genCard').addEventListener('click', ()=> $('#cardOut').textContent = makeCard());
+  $('#copyCard').addEventListener('click', async ()=>{ const t=$('#cardOut').textContent; if(!t){alert('Generate the card first.');return;} try{ await navigator.clipboard.writeText(t); alert('Copied!'); }catch{} });
+  $('#exportJson').addEventListener('click', ()=>{ const data={profile:getProfile(), checks:getChecks()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`${(data.profile.discord||'player').replace(/[^a-z0-9_\-]+/gi,'_')}_mwz_onboarding.json`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); });
+  $('#importJson').addEventListener('click', ()=> $('#importFile').click());
+  $('#importFile').addEventListener('change', e=>{ const f=e.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=ev=>{ try{ const d=JSON.parse(ev.target.result); if(d.profile) setProfile(d.profile); if(d.checks) setChecks(d.checks); $('#cardOut').textContent = makeCard(); }catch{ alert('Invalid JSON'); } }; r.readAsText(f); });
+  $('#saveLocal').addEventListener('click', ()=>{ const tag=$('#discord').value.trim()||'unknown'; const data={profile:getProfile(), checks:getChecks()}; localStorage.setItem(`mwz:onboard:${tag}`, JSON.stringify(data)); alert('Saved locally.'); });
+  $('#loadLocal').addEventListener('click', ()=>{ const tag=$('#discord').value.trim()||'unknown'; const raw=localStorage.getItem(`mwz:onboard:${tag}`); if(!raw){alert('No local save for this Discord tag.');return;} try{ const d=JSON.parse(raw); if(d.profile) setProfile(d.profile); if(d.checks) setChecks(d.checks); $('#cardOut').textContent = makeCard(); }catch{ alert('Corrupt save'); } });
+  $('#getShare').addEventListener('click', async ()=>{ const data={profile:getProfile(), checks:getChecks()}; const url=location.origin+location.pathname+"#s="+enc(JSON.stringify(data)); $('#shareUrl').value=url; try{ await navigator.clipboard.writeText(url); alert('Share link copied'); }catch{} });
+  $('#reset').addEventListener('click', ()=>{ $$('#step1 input, #step1 textarea').forEach(el=>el.value=''); allChecks.forEach(c=>c.checked=false); updateKPIs(); $('#cardOut').textContent=''; $('#shareUrl').value=''; history.replaceState(null,'',location.pathname); goto(0); });
+
+  function loadFromHash(){ if(!location.hash.startsWith('#s=')) return; try{ const d=JSON.parse(dec(location.hash.slice(3))); if(d.profile) setProfile(d.profile); if(d.checks) setChecks(d.checks); $('#cardOut').textContent = makeCard(); }catch{} }
+
+  // init
+  updateKPIs(); goto(0); loadFromHash();
+})();
+</script>
+</body>
+</html>
