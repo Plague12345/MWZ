@@ -250,6 +250,8 @@
           <button id="loadLocal">Load Locally</button>
           <button id="getShare">Get Share Link</button>
           <button id="reset">Reset</button>
+          <button id="saveToGitHub">Save to GitHub</button>
+          <button id="loadFromGitHub">Load from GitHub</button>
         </div>
         <div class="row" style="margin-top:10px;align-items:center;gap:8px">
           <input id="shareUrl" type="text" readonly placeholder="Share link will appear here…" />
@@ -447,6 +449,36 @@
     }catch(e){ console.warn('Bad share hash'); return false; }
   }
 
+  // ===== API config =====
+  // use your public API domain; you can keep http during testing, but https is strongly recommended
+  const API_BASE = 'https://api.plaguesmwzserver.com';
+  const API_KEY  = 'MWZ4LIFE'; // must match API_KEY on the server (.env). If you didn't set one, set this to '' and the header will be skipped.
+
+  async function saveToGitHub(profile, checks) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (API_KEY) headers['x-api-key'] = API_KEY;
+
+    const resp = await fetch(`${API_BASE}/save`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ profile, checks })
+    });
+    if (!resp.ok) throw new Error(await resp.text());
+    return resp.json();
+  }
+
+    async function loadFromGitHub(discordTag) {
+    const slug = (discordTag || '').toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'player';
+
+    const headers = {};
+    if (API_KEY) headers['x-api-key'] = API_KEY;
+
+    const resp = await fetch(`${API_BASE}/load/${slug}`, { headers });
+    if (!resp.ok) throw new Error(await resp.text());
+    return resp.json();
+  }
+
   // Buttons
   $('#genCard').addEventListener('click', ()=>{
     $('#cardOut').textContent = makeDiscordCard();
@@ -478,7 +510,38 @@
     $('#shareUrl').value = '';
     history.replaceState(null, '', location.pathname);
   });
+  // ===== Button wiring =====
+  // Works in both files because they share the same helper functions and element IDs.
+  const saveBtn = document.getElementById('saveToGitHub');
+  const loadBtn = document.getElementById('loadFromGitHub');
 
+  if (saveBtn) saveBtn.addEventListener('click', async () => {
+    try {
+      const profile = getProfile();
+      const checks  = typeof getChecksObject === 'function'
+        ? getChecksObject()
+        : (typeof getChecks === 'function' ? getChecks() : {});
+      const res = await saveToGitHub(profile, checks);
+      alert(`Saved to GitHub ✅\n${res.path}`);
+    } catch (e) {
+      alert('Save failed: ' + (e.message || e));
+    }
+  });
+
+  if (loadBtn) loadBtn.addEventListener('click', async () => {
+    try {
+      const tag = (document.getElementById('discord')?.value || '').trim();
+      if (!tag) { alert('Enter Discord tag first'); return; }
+      const data = await loadFromGitHub(tag);
+      if (data.profile) setProfile(data.profile);
+      if (data.checks)  (typeof setChecksObject === 'function' ? setChecksObject(data.checks) : setChecks(data.checks));
+      const out = document.getElementById('cardOut');
+      if (out && typeof makeDiscordCard === 'function') out.textContent = makeDiscordCard();
+      alert('Loaded from GitHub ✅');
+    } catch (e) {
+      alert('Load failed: ' + (e.message || e));
+    }
+  });
   // Init
   updateKPIs();
   loadFromHash();
